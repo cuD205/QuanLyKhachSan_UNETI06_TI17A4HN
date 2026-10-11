@@ -1,31 +1,152 @@
-html {
-  font-size: 14px;
-}
+/* Ho va ten: Duong Minh Duc
+   Ma sinh vien: 23103100282
+   Noi dung thuc hien: Theme mau/font dung chung cho toan bo website (Bootstrap override) */
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+/* ===== 1. Font chu ===== */
+/* Playfair Display: dung cho tieu de - cam giac khach san sang trong.
+   Inter: dung cho noi dung/form/bang - de doc, ro rang cho man hinh quan tri nhieu du lieu. */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
+/* ===== 2. Bang mau dung chung (CSS variables) ===== */
+:root {
+  --color-primary: #0F3D3E;       /* Xanh ngoc dam - mau chinh: navbar, nut chinh */
+  --color-primary-dark: #0A2B2C;  /* Dam hon, dung khi hover */
+  --color-accent: #C9A227;        /* Vang dong - diem nhan: nut quan trong, vien active */
+  --color-accent-dark: #A6841C;
+  --color-bg: #F7F6F2;            /* Nen trang ngoi, khong trang tinh */
+  --color-surface: #FFFFFF;       /* Nen the/card/bang */
+  --color-text: #1F2421;          /* Chu chinh */
+  --color-text-muted: #6B7280;    /* Chu phu */
+  --color-border: #E4E1D8;
 
-html {
-  position: relative;
-  min-height: 100%;
+  /* Mau trang thai - DUNG CHUNG cho ca Module 2 (trang thai Phong)
+     va Module 4 (trang thai Phieu dat) de dong nhat toan site */
+  --status-sansang: #2F7A4F;      /* xanh la - San sang / Da tra phong */
+  --status-dangsudung: #B8860B;   /* vang dat - Dang su dung / Da nhan phong */
+  --status-tamngung: #6B7280;     /* xam - Tam ngung */
+  --status-choxacnhan: #B8860B;   /* vang dat - Cho xac nhan */
+  --status-daxacnhan: #2A6F7F;    /* xanh duong nhat - Da xac nhan */
+  --status-daxxanhan: #2A6F7F;
+  --status-dahuy: #B3261E;        /* do - Da huy */
+
+  --radius: 6px;
+  --shadow-sm: 0 1px 3px rgba(15, 61, 62, 0.08);
 }
 
 body {
-  margin-bottom: 60px;
+  font-family: 'Inter', -apple-system, Segoe UI, Roboto, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+h1, h2, h3, h4, .display-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.2px;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+a {
+  color: var(--color-primary);
+}
+a:hover {
+  color: var(--color-accent-dark);
+}
+
+/* ===== 3. Navbar dung chung ===== */
+.navbar-main {
+  background-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+.navbar-main .navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #FFFFFF !important;
+  letter-spacing: 0.3px;
+}
+.navbar-main .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+}
+.navbar-main .nav-link:hover,
+.navbar-main .nav-link.active {
+  color: var(--color-accent) !important;
+}
+
+/* ===== 4. Nut bam - ghi de Bootstrap mac dinh ===== */
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  border-radius: var(--radius);
+}
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+.btn-accent {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #1F2421;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+.btn-accent:hover {
+  background-color: var(--color-accent-dark);
+  border-color: var(--color-accent-dark);
+  color: #FFFFFF;
+}
+
+/* ===== 5. The/Card va Bang - dung chung cho danh sach Phong, KhachHang, PhieuDatPhong... ===== */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: none; /* tranh kieu "SaaS card" do bong mo mac dinh */
+}
+.card-header {
+  background-color: var(--color-surface);
+  border-bottom: 2px solid var(--color-accent);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.table {
+  background-color: var(--color-surface);
+}
+.table thead th {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  font-weight: 600;
+  border: none;
+}
+.table tbody tr:hover {
+  background-color: rgba(201, 162, 39, 0.08); /* hover nhe mau vang dong */
+}
+
+/* ===== 6. Badge trang thai - DUNG CHUNG, khong tu dat mau rieng ===== */
+/* Cach dung trong View: <span class="badge badge-trangthai badge-sansang">San sang</span> */
+.badge-trangthai {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  padding: 0.4em 0.75em;
+  border-radius: 999px;
+}
+.badge-sansang, .badge-daxacnhan2 { background-color: var(--status-sansang); color: #fff; }
+.badge-dangsudung, .badge-danhanphong { background-color: var(--status-dangsudung); color: #1F2421; }
+.badge-tamngung { background-color: var(--status-tamngung); color: #fff; }
+.badge-choxacnhan { background-color: var(--status-choxacnhan); color: #1F2421; }
+.badge-daxacnhan { background-color: var(--status-daxacnhan); color: #fff; }
+.badge-datraphong { background-color: var(--status-sansang); color: #fff; }
+.badge-dahuy { background-color: var(--status-dahuy); color: #fff; }
+
+/* ===== 7. Trang dang nhap - dung cho Module 1 ===== */
+.auth-card {
+  max-width: 420px;
+  margin: 64px auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
 }
