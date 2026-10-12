@@ -1,0 +1,43 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@* Họ và tên: Diện | Module 2: Danh sách Phòng *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.Models.PhongIndexViewModel
+@{
+    ViewData["Title"] = "Danh sách phòng";
+    var vi = new System.Globalization.CultureInfo("vi-VN");
+}
+
+<h2>Danh sách phòng</h2>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Số phòng</th>
+                <th>Loại phòng</th>
+                <th>Tầng</th>
+                <th class="text-end">Đơn giá/đêm</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Phongs)
+            {
+                <tr>
+                    <td>@p.SoPhong</td>
+                    <td>@(p.LoaiPhong?.TenLoaiPhong ?? "(chưa có)")</td>
+                    <td>@p.Tang</td>
+                    <td class="text-end">@p.DonGiaDem.ToString("N0", vi) đ</td>
+                    <td><partial name="_TrangThaiPhongBadge" model="p.TrangThai" /></td>
+                </tr>
+            }
+            @if (!Model.Phongs.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted">Chưa có phòng nào.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,12 @@
+﻿@* Module 2 - Diện: badge trạng thái Phòng, dùng class của theme chung *@
+@model string
+@{
+    var (cls, text) = Model switch
+    {
+        TrangThaiPhong.SanSang => ("badge-sansang", "Sẵn sàng"),
+        TrangThaiPhong.DangSuDung => ("badge-dangsudung", "Đang sử dụng"),
+        TrangThaiPhong.TamNgung => ("badge-tamngung", "Tạm ngưng"),
+        _ => ("bg-secondary", Model)
+    };
+}
+<span class="badge badge-trangthai @cls">@text</span>
