@@ -188,6 +188,51 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             await NapDanhSachChon(phong.MaLoaiPhong);
             return View(phong);
         }
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (!LaAdmin()) return TuChoiTruyCap();
+            if (id == null) return NotFound();
+
+            var phong = await _context.Phongs.AsNoTracking()
+                .Include(p => p.LoaiPhong)
+                .FirstOrDefaultAsync(p => p.MaPhong == id);
+            if (phong == null) return NotFound();
+
+            ViewBag.CoLuotDat = await _context.ChiTietDatPhongs.AnyAsync(c => c.MaPhong == id);
+            return View(phong);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (!LaAdmin()) return TuChoiTruyCap();
+
+            var phong = await _context.Phongs.FindAsync(id);
+            if (phong == null) return RedirectToAction(nameof(Index));
+
+            // Chặn xóa nếu phòng đã có trong phiếu đặt
+            if (await _context.ChiTietDatPhongs.AnyAsync(c => c.MaPhong == id))
+            {
+                TempData["Error"] = $"Không thể xóa phòng {phong.SoPhong} vì đã có trong phiếu đặt phòng.";
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+
+            try
+            {
+                _context.Phongs.Remove(phong);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = $"Đã xóa phòng {phong.SoPhong}.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["Error"] = $"Không thể xóa phòng {phong.SoPhong}.";
+                return RedirectToAction(nameof(Delete), new { id });
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
 
         // ===== HÀM PHỤ =====
         private IActionResult TuChoiTruyCap()
