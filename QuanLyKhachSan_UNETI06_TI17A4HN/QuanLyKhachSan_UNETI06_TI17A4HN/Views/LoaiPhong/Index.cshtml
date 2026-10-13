@@ -1,0 +1,89 @@
+﻿@* Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Danh sách loại phòng (tìm theo tên, lọc trạng thái, đổi trạng thái nhanh) *@
+@model IEnumerable<LoaiPhong>
+@{
+    ViewData["Title"] = "Quản lý loại phòng";
+    string tuKhoa = ViewBag.TuKhoa ?? "";
+    string trangThai = ViewBag.TrangThai ?? "";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Quản lý loại phòng</h1>
+    <a asp-action="Create" class="btn btn-accent">+ Thêm loại phòng</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="tuKhoa" value="@tuKhoa" class="form-control" placeholder="Tìm theo tên loại phòng..." />
+            </div>
+            <div class="col-md-3">
+                <select name="trangThai" class="form-select">
+                    <option value="" selected="@(trangThai == "")">Tất cả trạng thái</option>
+                    <option value="1" selected="@(trangThai == "1")">Đang kinh doanh</option>
+                    <option value="0" selected="@(trangThai == "0")">Ngừng kinh doanh</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Mã</th>
+                <th>Tên loại phòng</th>
+                <th class="text-center">Số người tối đa</th>
+                <th class="text-end">Đơn giá / đêm</th>
+                <th class="text-center">Số phòng</th>
+                <th>Trạng thái</th>
+                <th style="width: 300px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.MaLoaiPhong</td>
+                    <td>@item.TenLoaiPhong</td>
+                    <td class="text-center">@item.SoNguoiToiDa</td>
+                    <td class="text-end">@item.DonGiaDem.ToTien()</td>
+                    <td class="text-center">@item.Phongs.Count</td>
+                    <td>
+                        @if (item.TrangThai)
+                        {
+                            <span class="badge badge-trangthai badge-sansang">Đang kinh doanh</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-trangthai badge-tamngung">Ngừng kinh doanh</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MaLoaiPhong" class="btn btn-sm btn-secondary">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.MaLoaiPhong" class="btn btn-sm btn-primary">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.MaLoaiPhong" class="btn btn-sm btn-danger">Xóa</a>
+                        <form asp-action="CapNhatTrangThai" asp-route-id="@item.MaLoaiPhong" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-accent">
+                                @(item.TrangThai ? "Ngừng KD" : "Mở KD")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Không tìm thấy loại phòng nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

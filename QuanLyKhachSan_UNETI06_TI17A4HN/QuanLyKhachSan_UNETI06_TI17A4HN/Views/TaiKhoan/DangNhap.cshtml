@@ -1,0 +1,34 @@
+﻿@* Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Giao diện đăng nhập (dùng class .auth-card của theme chung) *@
+@model DangNhapViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="auth-card">
+    <h2 class="text-center mb-4">Đăng nhập</h2>
+
+    <form asp-action="DangNhap" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <input type="hidden" asp-for="ReturnUrl" />
+
+        <div class="mb-3">
+            <label asp-for="TenDangNhap" class="form-label"></label>
+            <input asp-for="TenDangNhap" class="form-control" autofocus autocomplete="username" />
+            <span asp-validation-for="TenDangNhap" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MatKhau" class="form-label"></label>
+            <input asp-for="MatKhau" class="form-control" autocomplete="current-password" />
+            <span asp-validation-for="MatKhau" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,91 @@
+﻿@* Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Chi tiết loại phòng và danh sách phòng thuộc loại *@
+@model LoaiPhong
+@{
+    ViewData["Title"] = "Chi tiết loại phòng";
+}
+
+<h1 class="h3 mb-3">Chi tiết loại phòng</h1>
+
+<div class="card mb-4">
+    <div class="card-header">@Model.TenLoaiPhong</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Mã loại phòng</dt>
+            <dd class="col-sm-9">@Model.MaLoaiPhong</dd>
+
+            <dt class="col-sm-3">Tên loại phòng</dt>
+            <dd class="col-sm-9">@Model.TenLoaiPhong</dd>
+
+            <dt class="col-sm-3">Số người tối đa</dt>
+            <dd class="col-sm-9">@Model.SoNguoiToiDa</dd>
+
+            <dt class="col-sm-3">Đơn giá một đêm</dt>
+            <dd class="col-sm-9">@Model.DonGiaDem.ToTien()</dd>
+
+            <dt class="col-sm-3">Mô tả</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "(Chưa có mô tả)" : Model.MoTa)</dd>
+
+            <dt class="col-sm-3">Trạng thái</dt>
+            <dd class="col-sm-9">
+                @if (Model.TrangThai)
+                {
+                    <span class="badge badge-trangthai badge-sansang">Đang kinh doanh</span>
+                }
+                else
+                {
+                    <span class="badge badge-trangthai badge-tamngung">Ngừng kinh doanh</span>
+                }
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<h2 class="h5">Các phòng thuộc loại này (@Model.Phongs.Count)</h2>
+@if (Model.Phongs.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+            <thead>
+                <tr>
+                    <th>Số phòng</th>
+                    <th>Tầng</th>
+                    <th class="text-end">Đơn giá / đêm</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var phong in Model.Phongs.OrderBy(p => p.SoPhong))
+                {
+                    <tr>
+                        <td>@phong.SoPhong</td>
+                        <td>@phong.Tang</td>
+                        <td class="text-end">@phong.DonGiaDem.ToTien()</td>
+                        <td>
+                            @switch (phong.TrangThai)
+                            {
+                                case TrangThaiPhong.SanSang:
+                                    <span class="badge badge-trangthai badge-sansang">Sẵn sàng</span>
+                                    break;
+                                case TrangThaiPhong.DangSuDung:
+                                    <span class="badge badge-trangthai badge-dangsudung">Đang sử dụng</span>
+                                    break;
+                                default:
+                                    <span class="badge badge-trangthai badge-tamngung">Tạm ngừng</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="text-muted">Chưa có phòng nào thuộc loại này.</p>
+}
+
+<a asp-action="Edit" asp-route-id="@Model.MaLoaiPhong" class="btn btn-primary">Sửa</a>
+<a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>

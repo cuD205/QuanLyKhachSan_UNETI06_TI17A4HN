@@ -1,0 +1,46 @@
+﻿@* Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Trang xác nhận xóa loại phòng (chặn xóa khi còn phòng liên quan) *@
+@model LoaiPhong
+@{
+    ViewData["Title"] = "Xóa loại phòng";
+    bool coPhong = Model.Phongs.Any();
+}
+
+<h1 class="h3 mb-3">Xóa loại phòng</h1>
+
+@if (coPhong)
+{
+    <div class="alert alert-warning">
+        Loại phòng này đang có <strong>@Model.Phongs.Count</strong> phòng nên <strong>không thể xóa</strong>.
+        Bạn có thể chuyển sang trạng thái ngừng kinh doanh thay vì xóa.
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">Bạn có chắc chắn muốn xóa loại phòng này không? Thao tác không thể hoàn tác.</div>
+}
+
+<div class="card mb-3">
+    <div class="card-header">@Model.TenLoaiPhong</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Số người tối đa</dt>
+            <dd class="col-sm-9">@Model.SoNguoiToiDa</dd>
+
+            <dt class="col-sm-3">Đơn giá một đêm</dt>
+            <dd class="col-sm-9">@Model.DonGiaDem.ToTien()</dd>
+
+            <dt class="col-sm-3">Mô tả</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "(Chưa có mô tả)" : Model.MoTa)</dd>
+        </dl>
+    </div>
+</div>
+
+<form asp-action="Delete" asp-route-id="@Model.MaLoaiPhong" method="post">
+    @if (!coPhong)
+    {
+        <button type="submit" class="btn btn-danger">Xác nhận xóa</button>
+    }
+    <a asp-action="Index" class="btn btn-outline-secondary">Quay lại danh sách</a>
+</form>
