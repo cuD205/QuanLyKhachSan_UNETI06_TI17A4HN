@@ -137,6 +137,57 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (!LaAdmin()) return TuChoiTruyCap();
+            if (id == null) return NotFound();
+
+            var phong = await _context.Phongs.FindAsync(id);
+            if (phong == null) return NotFound();
+
+            await NapDanhSachChon(phong.MaLoaiPhong);
+            return View(phong);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("MaPhong,SoPhong,MaLoaiPhong,Tang,DonGiaDem,MoTa,TrangThai")] Phong phong)
+        {
+            if (!LaAdmin()) return TuChoiTruyCap();
+            if (id != phong.MaPhong) return NotFound();
+
+            ModelState.Remove(nameof(Phong.LoaiPhong));
+            phong.SoPhong = (phong.SoPhong ?? string.Empty).Trim();
+            await KiemTraNghiepVu(phong, id);
+
+            if (ModelState.IsValid)
+            {
+                var hienTai = await _context.Phongs.FindAsync(id);
+                if (hienTai == null) return NotFound();
+
+                // Chỉ cập nhật các trường được phép sửa
+                hienTai.SoPhong = phong.SoPhong;
+                hienTai.MaLoaiPhong = phong.MaLoaiPhong;
+                hienTai.Tang = phong.Tang;
+                hienTai.DonGiaDem = phong.DonGiaDem;
+                hienTai.MoTa = phong.MoTa;
+                hienTai.TrangThai = phong.TrangThai;
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    TempData["Success"] = $"Đã cập nhật phòng {hienTai.SoPhong}.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException)
+                {
+                    ModelState.AddModelError(nameof(Phong.SoPhong), "Không lưu được. Số phòng có thể đã tồn tại.");
+                }
+            }
+
+            await NapDanhSachChon(phong.MaLoaiPhong);
+            return View(phong);
+        }
 
         // ===== HÀM PHỤ =====
         private IActionResult TuChoiTruyCap()
