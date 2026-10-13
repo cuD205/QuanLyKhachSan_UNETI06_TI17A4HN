@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
 
+
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 {
     public class PhongController : Controller
