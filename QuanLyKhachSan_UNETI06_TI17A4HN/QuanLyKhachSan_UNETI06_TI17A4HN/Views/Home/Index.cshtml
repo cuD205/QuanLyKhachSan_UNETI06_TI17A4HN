@@ -1,8 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@* Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Trang chủ (thay giao diện mặc định, hiển thị theo trạng thái đăng nhập và vai trò) *@
+@{
+    ViewData["Title"] = "Trang chủ";
+    var daDangNhap = Context.Session.DaDangNhap();
+    var laAdmin = Context.Session.LaAdmin();
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="card">
+    <div class="card-header">Khách sạn UNETI06</div>
+    <div class="card-body text-center py-5">
+        <h1 class="display-heading mb-2">Chào mừng đến với khách sạn</h1>
+        <p class="lead text-muted">Hệ thống quản lý khách sạn và đặt phòng trực tuyến.</p>
+
+        @if (!daDangNhap)
+        {
+            <a asp-controller="TaiKhoan" asp-action="DangNhap" class="btn btn-accent btn-lg">Đăng nhập để bắt đầu</a>
+        }
+        else if (laAdmin)
+        {
+            <p>Xin chào <strong>@Context.Session.LayHoTen()</strong>, bạn đang đăng nhập với quyền quản trị.</p>
+            <a asp-controller="LoaiPhong" asp-action="Index" class="btn btn-primary">Quản lý loại phòng</a>
+        }
+        else
+        {
+            <p>Xin chào <strong>@Context.Session.LayHoTen()</strong>, chúc bạn có một kỳ nghỉ thật thoải mái.</p>
+        }
+    </div>
 </div>
