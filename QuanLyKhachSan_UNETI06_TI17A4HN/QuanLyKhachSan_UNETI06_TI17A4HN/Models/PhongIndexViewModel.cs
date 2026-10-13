@@ -1,25 +1,27 @@
-﻿// Họ và tên: Diện | Mã sinh viên: [MSSV của bạn]
-// Module 2: Quản lý và tra cứu Phòng
-// Nội dung: ViewModel cho trang danh sách Phòng
+﻿// Họ và tên: [Họ tên đầy đủ]
+// Mã sinh viên: [MSSV]
+// Nội dung thực hiện: Model cho trang danh sách phòng (điều kiện tìm kiếm, lọc, sắp xếp)
 using Microsoft.AspNetCore.Mvc.Rendering;
+
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Models
 {
     public class PhongIndexViewModel
     {
         public List<Phong> Phongs { get; set; } = new();
+
+        // Điều kiện tìm kiếm, lọc, sắp xếp đang dùng
         public string? Search { get; set; }
-        // Điều kiện lọc đang dùng
         public int? MaLoaiPhong { get; set; }
         public int? Tang { get; set; }
         public string? TrangThai { get; set; }
         public decimal? GiaTu { get; set; }
         public decimal? GiaDen { get; set; }
+        public string SapXep { get; set; } = "sophong_tang";
 
         // Dữ liệu cho các ô chọn
         public List<SelectListItem> LoaiPhongOptions { get; set; } = new();
         public List<SelectListItem> TangOptions { get; set; } = new();
         public List<SelectListItem> TrangThaiOptions { get; set; } = new();
+        public List<SelectListItem> SapXepOptions { get; set; } = new();
     }
-
-
 }

@@ -1,14 +1,11 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@* Họ và tên: [Họ tên đầy đủ] *@
+@* Mã sinh viên: [MSSV] *@
+@* Nội dung thực hiện: CRUD phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp *@
+@model PhongIndexViewModel
 @{
-}
-@* Họ và tên: Diện | Module 2: Danh sách Phòng *@
-@model QuanLyKhachSan_UNETI06_TI17A4HN.Models.PhongIndexViewModel
-@{
-    bool laAdmin = ViewBag.LaAdmin == true;
     ViewData["Title"] = "Danh sách phòng";
     var vi = new System.Globalization.CultureInfo("vi-VN");
+    bool laAdmin = ViewBag.LaAdmin == true;
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -27,6 +24,7 @@
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
+
 <div class="card mb-3">
     <div class="card-header">Tìm kiếm và lọc</div>
     <div class="card-body">
@@ -64,6 +62,10 @@
                     <input type="number" min="0" step="1000" class="form-control" id="giaDen" name="giaDen"
                            value="@(Model.GiaDen?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="sapXep">Sắp xếp</label>
+                    <select class="form-select" id="sapXep" name="sapXep" asp-items="Model.SapXepOptions"></select>
+                </div>
             </div>
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Tìm và lọc</button>
@@ -72,6 +74,7 @@
         </form>
     </div>
 </div>
+
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -81,13 +84,11 @@
                 <th>Tầng</th>
                 <th class="text-end">Đơn giá/đêm</th>
                 <th>Trạng thái</th>
-                
                 <th>Thao tác</th>
                 @if (laAdmin)
                 {
                     <th>Đổi trạng thái</th>
                 }
-
             </tr>
         </thead>
         <tbody>
@@ -104,8 +105,8 @@
                         @if (laAdmin)
                         {
                             <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.MaPhong">Sửa</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.MaPhong">Xóa</a>
                         }
-                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.MaPhong">Xóa</a>
                     </td>
                     @if (laAdmin)
                     {
@@ -132,7 +133,7 @@
             }
             @if (!Model.Phongs.Any())
             {
-                <tr><td colspan="@(laAdmin ? 7 : 6)" class="text-center text-muted">Chưa có phòng nào.</td></tr>
+                <tr><td colspan="@(laAdmin ? 7 : 6)" class="text-center text-muted">Không có phòng nào phù hợp.</td></tr>
             }
         </tbody>
     </table>

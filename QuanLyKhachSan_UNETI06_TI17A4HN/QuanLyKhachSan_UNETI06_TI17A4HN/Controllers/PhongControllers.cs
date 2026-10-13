@@ -1,6 +1,6 @@
 ﻿// Họ và tên: [Họ tên đầy đủ]
 // Mã sinh viên: [MSSV]
-// Nội dung thực hiện: Danh sách, chi tiết, thêm phòng, cập nhật trạng thái phòng
+// Nội dung thực hiện: CRUD phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -35,9 +35,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             base.OnActionExecuting(context);
         }
 
-        // ===== DANH SÁCH =====
+        // ===== DANH SÁCH: tìm kiếm + lọc + sắp xếp =====
         public async Task<IActionResult> Index(string? search, int? maLoaiPhong, int? tang,
-    string? trangThai, decimal? giaTu, decimal? giaDen)
+            string? trangThai, decimal? giaTu, decimal? giaDen, string? sapXep)
         {
             // Nếu nhập ngược khoảng giá thì đổi chỗ
             if (giaTu.HasValue && giaDen.HasValue && giaTu > giaDen)
@@ -45,11 +45,12 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 (giaTu, giaDen) = (giaDen, giaTu);
             }
             if (string.IsNullOrWhiteSpace(trangThai) || !DanhSachTrangThai().ContainsKey(trangThai)) trangThai = null;
+            if (string.IsNullOrWhiteSpace(sapXep) || !DanhSachSapXep().ContainsKey(sapXep)) sapXep = "sophong_tang";
             search = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
 
             var query = _context.Phongs.AsNoTracking().Include(p => p.LoaiPhong).AsQueryable();
 
-            // Tìm kiếm
+            // Tìm kiếm theo Số phòng và Tên loại phòng
             if (search != null)
             {
                 query = query.Where(p => p.SoPhong.Contains(search)
@@ -63,9 +64,18 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             if (giaTu.HasValue) query = query.Where(p => p.DonGiaDem >= giaTu.Value);
             if (giaDen.HasValue) query = query.Where(p => p.DonGiaDem <= giaDen.Value);
 
-            var phongs = await query
-                .OrderBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong)
-                .ToListAsync();
+            // Sắp xếp (luôn có ThenBy để thứ tự ổn định)
+            IOrderedQueryable<Phong> sorted = sapXep switch
+            {
+                "sophong_giam" => query.OrderByDescending(p => p.SoPhong.Length).ThenByDescending(p => p.SoPhong),
+                "gia_tang" => query.OrderBy(p => p.DonGiaDem).ThenBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
+                "gia_giam" => query.OrderByDescending(p => p.DonGiaDem).ThenBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
+                "tang_tang" => query.OrderBy(p => p.Tang).ThenBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
+                "tang_giam" => query.OrderByDescending(p => p.Tang).ThenBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
+                _ => query.OrderBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
+            };
+
+            var phongs = await sorted.ToListAsync();
 
             var vm = new PhongIndexViewModel
             {
@@ -75,7 +85,8 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 Tang = tang,
                 TrangThai = trangThai,
                 GiaTu = giaTu,
-                GiaDen = giaDen
+                GiaDen = giaDen,
+                SapXep = sapXep
             };
 
             var loaiPhongs = await _context.LoaiPhongs.AsNoTracking().OrderBy(l => l.TenLoaiPhong).ToListAsync();
@@ -90,6 +101,10 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             vm.TrangThaiOptions = DanhSachTrangThai()
                 .Select(kv => new SelectListItem(kv.Value, kv.Key, kv.Key == trangThai))
+                .ToList();
+
+            vm.SapXepOptions = DanhSachSapXep()
+                .Select(kv => new SelectListItem(kv.Value, kv.Key, kv.Key == sapXep))
                 .ToList();
 
             return View(vm);
@@ -183,6 +198,8 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
+
+        // ===== SỬA =====
         public async Task<IActionResult> Edit(int? id)
         {
             if (!LaAdmin()) return TuChoiTruyCap();
@@ -234,6 +251,8 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             await NapDanhSachChon(phong.MaLoaiPhong);
             return View(phong);
         }
+
+        // ===== XÓA =====
         public async Task<IActionResult> Delete(int? id)
         {
             if (!LaAdmin()) return TuChoiTruyCap();
@@ -278,7 +297,6 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
 
         // ===== HÀM PHỤ =====
         private IActionResult TuChoiTruyCap()
@@ -330,6 +348,16 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             { TrangThaiPhong.SanSang, "Sẵn sàng" },
             { TrangThaiPhong.DangSuDung, "Đang sử dụng" },
             { TrangThaiPhong.TamNgung, "Tạm ngừng" }
+        };
+
+        private static Dictionary<string, string> DanhSachSapXep() => new()
+        {
+            { "sophong_tang", "Số phòng tăng dần" },
+            { "sophong_giam", "Số phòng giảm dần" },
+            { "gia_tang", "Đơn giá thấp → cao" },
+            { "gia_giam", "Đơn giá cao → thấp" },
+            { "tang_tang", "Tầng tăng dần" },
+            { "tang_giam", "Tầng giảm dần" }
         };
     }
 }
