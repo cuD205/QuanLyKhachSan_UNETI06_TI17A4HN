@@ -1,0 +1,65 @@
+﻿@* Họ và tên: Đinh Ngọc Cường *@
+@* Mã sinh viên: 23103100260 *@
+@* Nội dung thực hiện: Giao diện chi tiết phiếu đặt phòng của khách hàng *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.Models.PhieuDatPhong
+@using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
+@{
+    ViewData["Title"] = "Chi tiết phiếu đặt phòng";
+}
+
+<h2 class="mb-3">Phiếu đặt phòng #@Model.MaPhieuDat</h2>
+
+<partial name="_ThongBao" />
+
+<dl class="row">
+    <dt class="col-sm-3">Khách hàng</dt>
+    <dd class="col-sm-9">@Model.KhachHang?.HoTen</dd>
+
+    <dt class="col-sm-3">Ngày đặt</dt>
+    <dd class="col-sm-9">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</dd>
+
+    <dt class="col-sm-3">Ngày nhận dự kiến</dt>
+    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayNhanDuKien)</dd>
+
+    <dt class="col-sm-3">Ngày trả dự kiến</dt>
+    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayTraDuKien)</dd>
+
+    <dt class="col-sm-3">Trạng thái</dt>
+    <dd class="col-sm-9">
+        <span class="badge bg-@DinhDang.MauTrangThaiPhieu(Model.TrangThai)">
+            @DinhDang.TenTrangThaiPhieu(Model.TrangThai)
+        </span>
+    </dd>
+
+    <dt class="col-sm-3">Tổng tiền dự kiến</dt>
+    <dd class="col-sm-9"><strong>@DinhDang.Tien(Model.TongTienDuKien)</strong></dd>
+</dl>
+
+<h4 class="mt-4">Chi tiết phòng</h4>
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Số phòng</th>
+                <th>Loại phòng</th>
+                <th class="text-end">Đơn giá / đêm</th>
+                <th class="text-end">Số đêm</th>
+                <th class="text-end">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ct in Model.ChiTietDatPhongs)
+            {
+                <tr>
+                    <td>@ct.Phong?.SoPhong</td>
+                    <td>@ct.Phong?.LoaiPhong?.TenLoaiPhong</td>
+                    <td class="text-end">@DinhDang.Tien(ct.DonGiaDem)</td>
+                    <td class="text-end">@ct.SoDem</td>
+                    <td class="text-end">@DinhDang.Tien(ct.ThanhTien)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-2">Về trang chủ</a>

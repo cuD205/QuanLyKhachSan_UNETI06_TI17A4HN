@@ -1,0 +1,103 @@
+﻿@* Họ và tên: Đinh Ngọc Cường *@
+@* Mã sinh viên: 23103100260 *@
+@* Nội dung thực hiện: Giao diện form đặt phòng của khách hàng *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels.DatPhongViewModel
+@using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
+@{
+    ViewData["Title"] = "Đặt phòng";
+    var phong = ViewData["Phong"] as QuanLyKhachSan_UNETI06_TI17A4HN.Models.Phong;
+    string homNay = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<h2 class="mb-3">Đặt phòng</h2>
+
+<partial name="_ThongBao" />
+
+@if (phong != null)
+{
+    <div class="row">
+        <div class="col-md-5 mb-3">
+            <div class="card" id="thongTinPhong" data-gia="@((long)phong.DonGiaDem)">
+                <div class="card-header fw-bold">Phòng @phong.SoPhong</div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Loại phòng: <strong>@phong.LoaiPhong?.TenLoaiPhong</strong></li>
+                    <li class="list-group-item">Tầng: @phong.Tang</li>
+                    <li class="list-group-item">Sức chứa: tối đa @phong.LoaiPhong?.SoNguoiToiDa người</li>
+                    <li class="list-group-item">Đơn giá: <strong>@DinhDang.Tien(phong.DonGiaDem)</strong> / đêm</li>
+                    @if (!string.IsNullOrWhiteSpace(phong.MoTa))
+                    {
+                        <li class="list-group-item">@phong.MoTa</li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="MaPhong" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NgayNhanDuKien" class="form-label"></label>
+                        <input asp-for="NgayNhanDuKien" type="date" class="form-control" min="@homNay" />
+                        <span asp-validation-for="NgayNhanDuKien" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="NgayTraDuKien" class="form-label"></label>
+                        <input asp-for="NgayTraDuKien" type="date" class="form-control" min="@homNay" />
+                        <span asp-validation-for="NgayTraDuKien" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="SoNguoi" class="form-label"></label>
+                    <input asp-for="SoNguoi" type="number" min="1" class="form-control" />
+                    <span asp-validation-for="SoNguoi" class="text-danger"></span>
+                </div>
+
+                <div class="alert alert-secondary">
+                    <div id="xemTruoc">Chọn ngày nhận và ngày trả để xem tạm tính.</div>
+                    <small class="text-muted">Giá trị thật do hệ thống tính khi đặt phòng.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Xác nhận đặt phòng</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Chỉ để XEM TRƯỚC cho tiện. Số đêm và tổng tiền thật do server tính.
+        (function() {
+            var card = document.getElementById('thongTinPhong');
+            if (!card) return;
+            var gia = parseInt(card.dataset.gia, 10);
+            var nhan = document.getElementById('NgayNhanDuKien');
+            var tra = document.getElementById('NgayTraDuKien');
+            var kq = document.getElementById('xemTruoc');
+
+            function capNhat() {
+                if (!nhan.value || !tra.value) {
+                    kq.textContent = 'Chọn ngày nhận và ngày trả để xem tạm tính.';
+                    return;
+                }
+                var soDem = Math.round((new Date(tra.value) - new Date(nhan.value)) / 86400000);
+                if (isNaN(soDem) || soDem <= 0) {
+                    kq.textContent = 'Ngày trả phải sau ngày nhận.';
+                    return;
+                }
+                var tong = soDem * gia;
+                kq.textContent = 'Tạm tính: ' + soDem + ' đêm x ' + gia.toLocaleString('vi-VN') +
+                    ' đ = ' + tong.toLocaleString('vi-VN') + ' đ';
+            }
+
+            nhan.addEventListener('change', capNhat);
+            tra.addEventListener('change', capNhat);
+            capNhat();
+        })();
+    </script>
+}
