@@ -1,0 +1,91 @@
+﻿@* Họ và tên: Đinh Ngọc Cường *@
+@* Mã sinh viên: 23103100260 *@
+@* Nội dung thực hiện: Giao diện khách hàng xem/sửa thông tin cá nhân *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels.ThongTinCaNhanViewModel
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    bool daCoHoSo = ViewData["DaCoHoSo"] as bool? ?? false;
+    bool biKhoa = ViewData["BiKhoa"] as bool? ?? false;
+}
+
+<h2 class="mb-3">Thông tin cá nhân</h2>
+
+<partial name="_ThongBao" />
+
+@if (!daCoHoSo)
+{
+    <div class="alert alert-warning">
+        Bạn chưa có hồ sơ khách hàng. Vui lòng điền đầy đủ thông tin bên dưới để có thể đặt phòng.
+    </div>
+}
+
+@if (biKhoa)
+{
+    <div class="alert alert-danger">
+        Hồ sơ của bạn đang bị khóa, bạn chỉ có thể xem thông tin. Vui lòng liên hệ khách sạn.
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="ThongTinCaNhan" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="HoTen" class="form-label"></label>
+                <input asp-for="HoTen" class="form-control" />
+                <span asp-validation-for="HoTen" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="NgaySinh" class="form-label"></label>
+                    <input asp-for="NgaySinh" type="date" class="form-control" />
+                    <span asp-validation-for="NgaySinh" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="GioiTinh" class="form-label"></label>
+                    <select asp-for="GioiTinh" class="form-select">
+                        <option value="">-- Chọn giới tính --</option>
+                        <option value="Nam">Nam</option>
+                        <option value="Nu">Nữ</option>
+                        <option value="Khac">Khác</option>
+                    </select>
+                    <span asp-validation-for="GioiTinh" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="SoDienThoai" class="form-label"></label>
+                    <input asp-for="SoDienThoai" class="form-control" />
+                    <span asp-validation-for="SoDienThoai" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CCCD" class="form-label"></label>
+                <input asp-for="CCCD" class="form-control" />
+                <span asp-validation-for="CCCD" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DiaChi" class="form-label"></label>
+                <textarea asp-for="DiaChi" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="DiaChi" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary" disabled="@biKhoa">Lưu thông tin</button>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
