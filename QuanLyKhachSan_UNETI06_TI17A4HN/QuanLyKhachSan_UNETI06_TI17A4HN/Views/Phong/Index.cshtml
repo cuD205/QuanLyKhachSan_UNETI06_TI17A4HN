@@ -27,14 +27,51 @@
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
-<form method="get" asp-action="Index" class="mb-3">
-    <div class="input-group">
-        <input type="text" class="form-control" name="search" value="@Model.Search"
-               placeholder="Số phòng hoặc tên loại phòng" />
-        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
-        <a class="btn btn-outline-secondary" asp-action="Index">Xóa</a>
+<div class="card mb-3">
+    <div class="card-header">Tìm kiếm và lọc</div>
+    <div class="card-body">
+        <form method="get" asp-action="Index">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="search">Số phòng hoặc tên loại phòng</label>
+                    <input type="text" class="form-control" id="search" name="search" value="@Model.Search" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="maLoaiPhong">Loại phòng</label>
+                    <select class="form-select" id="maLoaiPhong" name="maLoaiPhong" asp-items="Model.LoaiPhongOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="tang">Tầng</label>
+                    <select class="form-select" id="tang" name="tang" asp-items="Model.TangOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="trangThai">Trạng thái</label>
+                    <select class="form-select" id="trangThai" name="trangThai" asp-items="Model.TrangThaiOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="giaTu">Đơn giá từ (đ)</label>
+                    <input type="number" min="0" step="1000" class="form-control" id="giaTu" name="giaTu"
+                           value="@(Model.GiaTu?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="giaDen">Đơn giá đến (đ)</label>
+                    <input type="number" min="0" step="1000" class="form-control" id="giaDen" name="giaDen"
+                           value="@(Model.GiaDen?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Tìm và lọc</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Xóa bộ lọc</a>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 <div class="table-responsive">
     <table class="table">
         <thead>

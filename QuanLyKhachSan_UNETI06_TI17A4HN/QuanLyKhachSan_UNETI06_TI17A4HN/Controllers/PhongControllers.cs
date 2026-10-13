@@ -36,24 +36,62 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== DANH SÁCH =====
-        public async Task<IActionResult> Index(string? search)
+        public async Task<IActionResult> Index(string? search, int? maLoaiPhong, int? tang,
+    string? trangThai, decimal? giaTu, decimal? giaDen)
         {
+            // Nếu nhập ngược khoảng giá thì đổi chỗ
+            if (giaTu.HasValue && giaDen.HasValue && giaTu > giaDen)
+            {
+                (giaTu, giaDen) = (giaDen, giaTu);
+            }
+            if (string.IsNullOrWhiteSpace(trangThai) || !DanhSachTrangThai().ContainsKey(trangThai)) trangThai = null;
             search = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
 
             var query = _context.Phongs.AsNoTracking().Include(p => p.LoaiPhong).AsQueryable();
 
-            // Tìm kiếm theo Số phòng và Tên loại phòng
+            // Tìm kiếm
             if (search != null)
             {
                 query = query.Where(p => p.SoPhong.Contains(search)
                     || (p.LoaiPhong != null && p.LoaiPhong.TenLoaiPhong.Contains(search)));
             }
 
+            // 4 tiêu chí lọc, kết hợp được với nhau
+            if (maLoaiPhong.HasValue) query = query.Where(p => p.MaLoaiPhong == maLoaiPhong.Value);
+            if (tang.HasValue) query = query.Where(p => p.Tang == tang.Value);
+            if (trangThai != null) query = query.Where(p => p.TrangThai == trangThai);
+            if (giaTu.HasValue) query = query.Where(p => p.DonGiaDem >= giaTu.Value);
+            if (giaDen.HasValue) query = query.Where(p => p.DonGiaDem <= giaDen.Value);
+
             var phongs = await query
                 .OrderBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong)
                 .ToListAsync();
 
-            var vm = new PhongIndexViewModel { Phongs = phongs, Search = search };
+            var vm = new PhongIndexViewModel
+            {
+                Phongs = phongs,
+                Search = search,
+                MaLoaiPhong = maLoaiPhong,
+                Tang = tang,
+                TrangThai = trangThai,
+                GiaTu = giaTu,
+                GiaDen = giaDen
+            };
+
+            var loaiPhongs = await _context.LoaiPhongs.AsNoTracking().OrderBy(l => l.TenLoaiPhong).ToListAsync();
+            vm.LoaiPhongOptions = loaiPhongs
+                .Select(l => new SelectListItem(l.TenLoaiPhong, l.MaLoaiPhong.ToString(), l.MaLoaiPhong == maLoaiPhong))
+                .ToList();
+
+            var cacTang = await _context.Phongs.AsNoTracking().Select(p => p.Tang).Distinct().OrderBy(t => t).ToListAsync();
+            vm.TangOptions = cacTang
+                .Select(t => new SelectListItem($"Tầng {t}", t.ToString(), t == tang))
+                .ToList();
+
+            vm.TrangThaiOptions = DanhSachTrangThai()
+                .Select(kv => new SelectListItem(kv.Value, kv.Key, kv.Key == trangThai))
+                .ToList();
+
             return View(vm);
         }
 
