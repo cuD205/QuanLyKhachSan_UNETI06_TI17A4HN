@@ -29,5 +29,18 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             var vm = new PhongIndexViewModel { Phongs = phongs };
             return View(vm);
         }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var phong = await _context.Phongs.AsNoTracking()
+                .Include(p => p.LoaiPhong)
+                .FirstOrDefaultAsync(p => p.MaPhong == id);
+            if (phong == null) return NotFound();
+
+            ViewBag.SoLuotDat = await _context.ChiTietDatPhongs.CountAsync(c => c.MaPhong == id);
+            return View(phong);
+        }
+
     }
 }

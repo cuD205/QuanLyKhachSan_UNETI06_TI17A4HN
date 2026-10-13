@@ -1,0 +1,36 @@
+﻿@* Họ và tên: [Đoàn Xuân Diện] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Chi tiết phòng *@
+@model Phong
+@{
+    ViewData["Title"] = "Chi tiết phòng";
+    var vi = new System.Globalization.CultureInfo("vi-VN");
+}
+
+<h2>Phòng @Model.SoPhong</h2>
+<div class="card">
+    <div class="card-header">Chi tiết phòng</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Số phòng</dt>
+            <dd class="col-sm-9">@Model.SoPhong</dd>
+            <dt class="col-sm-3">Loại phòng</dt>
+            <dd class="col-sm-9">@(Model.LoaiPhong?.TenLoaiPhong ?? "(chưa có)")</dd>
+            <dt class="col-sm-3">Sức chứa tối đa</dt>
+            <dd class="col-sm-9">@(Model.LoaiPhong != null ? Model.LoaiPhong.SoNguoiToiDa + " người" : "-")</dd>
+            <dt class="col-sm-3">Tầng</dt>
+            <dd class="col-sm-9">@Model.Tang</dd>
+            <dt class="col-sm-3">Đơn giá/đêm</dt>
+            <dd class="col-sm-9">@Model.DonGiaDem.ToString("N0", vi) đ</dd>
+            <dt class="col-sm-3">Trạng thái</dt>
+            <dd class="col-sm-9"><partial name="_TrangThaiPhongBadge" model="Model.TrangThai" /></dd>
+            <dt class="col-sm-3">Số lượt đã đặt</dt>
+            <dd class="col-sm-9">@ViewBag.SoLuotDat</dd>
+            <dt class="col-sm-3">Mô tả</dt>
+            <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.MoTa) ? "-" : Model.MoTa)</dd>
+        </dl>
+    </div>
+</div>
+<div class="mt-3">
+    <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
+</div>

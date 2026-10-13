@@ -21,6 +21,7 @@
                 <th>Tầng</th>
                 <th class="text-end">Đơn giá/đêm</th>
                 <th>Trạng thái</th>
+                <th>Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -32,11 +33,14 @@
                     <td>@p.Tang</td>
                     <td class="text-end">@p.DonGiaDem.ToString("N0", vi) đ</td>
                     <td><partial name="_TrangThaiPhongBadge" model="p.TrangThai" /></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@p.MaPhong">Chi tiết</a>
+                    </td>
                 </tr>
             }
             @if (!Model.Phongs.Any())
             {
-                <tr><td colspan="5" class="text-center text-muted">Chưa có phòng nào.</td></tr>
+                <tr><td colspan="6" class="text-center text-muted">Chưa có phòng nào.</td></tr>
             }
         </tbody>
     </table>
