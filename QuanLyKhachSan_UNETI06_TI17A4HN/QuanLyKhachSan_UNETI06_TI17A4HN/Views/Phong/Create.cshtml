@@ -1,0 +1,26 @@
+﻿@* Họ và tên: [Đoàn Xuân Diện ] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Thêm phòng *@
+@model Phong
+@{
+    ViewData["Title"] = "Thêm phòng";
+}
+
+<h2>Thêm phòng mới</h2>
+<div class="card">
+    <div class="card-header">Thông tin phòng</div>
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <partial name="_PhongFields" model="Model" />
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
