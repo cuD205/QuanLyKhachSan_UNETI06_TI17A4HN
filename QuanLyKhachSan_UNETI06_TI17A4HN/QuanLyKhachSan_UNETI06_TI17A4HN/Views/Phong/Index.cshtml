@@ -27,6 +27,14 @@
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
+<form method="get" asp-action="Index" class="mb-3">
+    <div class="input-group">
+        <input type="text" class="form-control" name="search" value="@Model.Search"
+               placeholder="Số phòng hoặc tên loại phòng" />
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Xóa</a>
+    </div>
+</form>
 <div class="table-responsive">
     <table class="table">
         <thead>

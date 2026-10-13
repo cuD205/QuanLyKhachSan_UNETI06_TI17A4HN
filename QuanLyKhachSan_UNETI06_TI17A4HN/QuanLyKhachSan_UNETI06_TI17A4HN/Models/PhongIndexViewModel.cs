@@ -6,5 +6,8 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Models
     public class PhongIndexViewModel
     {
         public List<Phong> Phongs { get; set; } = new();
+        public string? Search { get; set; }
     }
+
+
 }

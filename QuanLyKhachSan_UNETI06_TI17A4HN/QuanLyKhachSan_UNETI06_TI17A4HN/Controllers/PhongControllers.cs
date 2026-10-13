@@ -36,16 +36,24 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== DANH SÁCH =====
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search)
         {
-            // Include để lấy kèm Tên loại phòng; sắp xếp số phòng theo thứ tự số
-            var phongs = await _context.Phongs
-                .AsNoTracking()
-                .Include(p => p.LoaiPhong)
+            search = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
+
+            var query = _context.Phongs.AsNoTracking().Include(p => p.LoaiPhong).AsQueryable();
+
+            // Tìm kiếm theo Số phòng và Tên loại phòng
+            if (search != null)
+            {
+                query = query.Where(p => p.SoPhong.Contains(search)
+                    || (p.LoaiPhong != null && p.LoaiPhong.TenLoaiPhong.Contains(search)));
+            }
+
+            var phongs = await query
                 .OrderBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong)
                 .ToListAsync();
 
-            var vm = new PhongIndexViewModel { Phongs = phongs };
+            var vm = new PhongIndexViewModel { Phongs = phongs, Search = search };
             return View(vm);
         }
 
