@@ -1,4 +1,4 @@
-﻿// Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên]
+﻿// Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281]
 // Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng
 // Nội dung: Lưu / đọc thông tin đăng nhập trong Session (Mã tài khoản, Họ tên, Vai trò) - cả nhóm dùng chung
 using QuanLyKhachSan_UNETI06_TI17A4HN.Models;

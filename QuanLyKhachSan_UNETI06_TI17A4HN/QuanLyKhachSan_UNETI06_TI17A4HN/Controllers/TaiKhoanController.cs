@@ -1,4 +1,4 @@
-﻿// Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên]
+﻿// Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281]
 // Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng
 // Nội dung: Đăng nhập (EF Core + LINQ, kiểm tra mật khẩu, tài khoản khóa), đăng xuất, từ chối truy cập
 using Microsoft.AspNetCore.Mvc;

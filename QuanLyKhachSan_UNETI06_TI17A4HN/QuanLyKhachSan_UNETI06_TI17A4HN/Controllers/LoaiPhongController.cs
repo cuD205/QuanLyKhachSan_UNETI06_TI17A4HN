@@ -1,4 +1,4 @@
-﻿// Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên]
+﻿// Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281]
 // Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng
 // Nội dung: Quản lý loại phòng (danh sách, chi tiết, thêm, sửa, xóa, cập nhật trạng thái) - chỉ Admin
 using Microsoft.AspNetCore.Mvc;

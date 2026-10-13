@@ -1,4 +1,4 @@
-﻿// Sinh viên: [Họ và tên] - MSSV: [Mã sinh viên]
+﻿// Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281]
 // Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng
 // Nội dung: Định dạng tiền Việt Nam dùng chung cho các View (350000 -> 350.000 ₫)
 using System.Globalization;
