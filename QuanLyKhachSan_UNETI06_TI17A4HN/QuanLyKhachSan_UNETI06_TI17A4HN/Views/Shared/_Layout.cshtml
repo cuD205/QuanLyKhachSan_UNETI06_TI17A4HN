@@ -1,4 +1,4 @@
-@*  Ho va ten: Duong Minh Duc | Ma sinh vien: 23103100282
+    @*  Ho va ten: Duong Minh Duc | Ma sinh vien: 23103100282
     Noi dung thuc hien: Navbar va layout dung chung, ap dung theme site.css *@
 <!DOCTYPE html>
 <html lang="vi">
@@ -37,6 +37,18 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="ThongKe" asp-action="Dashboard">Dashboard</a> @* Module 4 - Duc *@
                         </li>
+                        @if (Context.Session.GetString("VaiTro") == "Admin")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="KhachHang" asp-action="Index">Quản lý khách hàng</a>
+                            </li>
+                        }
+                        @if (Context.Session.GetString("VaiTro") == "KhachHang")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="KhachHang" asp-action="ThongTinCaNhan">Thông tin cá nhân</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @* Hien thi theo Session - Liem code phan nay khi lam dang nhap/dang xuat *@

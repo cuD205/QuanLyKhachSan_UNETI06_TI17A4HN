@@ -1,0 +1,96 @@
+﻿@* Họ và tên: Đinh Ngọc Cường *@
+@* Mã sinh viên: 23103100260 *@
+@* Nội dung thực hiện: Giao diện chi tiết khách hàng và các phiếu đặt phòng (Admin) *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.Models.KhachHang
+@using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+}
+
+<h2 class="mb-3">Chi tiết khách hàng</h2>
+
+<partial name="_ThongBao" />
+
+<dl class="row">
+    <dt class="col-sm-3">Họ tên</dt>
+    <dd class="col-sm-9">@Model.HoTen</dd>
+
+    <dt class="col-sm-3">Tên đăng nhập</dt>
+    <dd class="col-sm-9">@Model.TaiKhoan?.TenDangNhap</dd>
+
+    <dt class="col-sm-3">Ngày sinh</dt>
+    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgaySinh)</dd>
+
+    <dt class="col-sm-3">Giới tính</dt>
+    <dd class="col-sm-9">@Model.GioiTinh</dd>
+
+    <dt class="col-sm-3">Số điện thoại</dt>
+    <dd class="col-sm-9">@Model.SoDienThoai</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">CCCD</dt>
+    <dd class="col-sm-9">@Model.CCCD</dd>
+
+    <dt class="col-sm-3">Địa chỉ</dt>
+    <dd class="col-sm-9">@Model.DiaChi</dd>
+
+    <dt class="col-sm-3">Ngày đăng ký</dt>
+    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayDangKy)</dd>
+
+    <dt class="col-sm-3">Trạng thái</dt>
+    <dd class="col-sm-9">
+        @if (Model.TrangThai)
+        {
+            <span class="badge bg-success">Hoạt động</span>
+        }
+        else
+        {
+            <span class="badge bg-danger">Bị khóa</span>
+        }
+    </dd>
+</dl>
+
+<h4 class="mt-4">Phiếu đặt phòng (@Model.PhieuDatPhongs.Count)</h4>
+
+@if (!Model.PhieuDatPhongs.Any())
+{
+    <div class="alert alert-info">Khách hàng này chưa có phiếu đặt phòng.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã phiếu</th>
+                    <th>Ngày đặt</th>
+                    <th>Ngày nhận</th>
+                    <th>Ngày trả</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.PhieuDatPhongs.OrderByDescending(p => p.NgayDat))
+                {
+                    <tr>
+                        <td>@p.MaPhieuDat</td>
+                        <td>@DinhDang.Ngay(p.NgayDat)</td>
+                        <td>@DinhDang.Ngay(p.NgayNhanDuKien)</td>
+                        <td>@DinhDang.Ngay(p.NgayTraDuKien)</td>
+                        <td>@DinhDang.Tien(p.TongTienDuKien)</td>
+                        <td>
+                            <span class="badge bg-@DinhDang.MauTrangThaiPhieu(p.TrangThai)">
+                                @DinhDang.TenTrangThaiPhieu(p.TrangThai)
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Quay lại danh sách</a>
