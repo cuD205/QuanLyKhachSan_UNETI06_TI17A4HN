@@ -181,6 +181,60 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             return View(phieu);
         }
+        // ===== Danh sách "Phiếu của tôi" (lọc theo trạng thái) =====
+        public async Task<IActionResult> Index(string? trangThai)
+        {
+            var khachHang = await LayKhachHangDangNhapAsync();
+            if (khachHang == null) return ChuyenDenHoSo();
+
+            // Chỉ lấy phiếu của khách đang đăng nhập (MaKhachHang từ Session, không từ URL)
+            var query = _context.PhieuDatPhongs
+                .AsNoTracking()
+                .Include(p => p.KhachHang)
+                .Include(p => p.ChiTietDatPhongs)
+                    .ThenInclude(c => c.Phong)
+                .Where(p => p.MaKhachHang == khachHang.MaKhachHang);
+
+            // Lọc theo trạng thái nếu khách có chọn
+            if (!string.IsNullOrWhiteSpace(trangThai))
+            {
+                query = query.Where(p => p.TrangThai == trangThai);
+            }
+
+            // Phiếu mới đặt hiển thị trước
+            var danhSach = await query
+                .OrderByDescending(p => p.NgayDat)
+                .ToListAsync();
+
+            ViewData["TrangThai"] = trangThai;
+            return View(danhSach);
+        }
+
+        // ===== Lịch sử lưu trú: các phiếu đã trả phòng của chính mình =====
+        public async Task<IActionResult> LichSuLuuTru()
+        {
+            var khachHang = await LayKhachHangDangNhapAsync();
+            if (khachHang == null) return ChuyenDenHoSo();
+
+            var danhSach = await _context.PhieuDatPhongs
+                .AsNoTracking()
+                .Include(p => p.ChiTietDatPhongs)
+                    .ThenInclude(c => c.Phong)
+                        .ThenInclude(ph => ph!.LoaiPhong)
+                .Where(p => p.MaKhachHang == khachHang.MaKhachHang
+                         && p.TrangThai == TrangThaiPhieu.DaTraPhong)
+                .OrderByDescending(p => p.NgayTraDuKien)
+                .ToListAsync();
+
+            return View(danhSach);
+        }
+
+        // Khách chưa có hồ sơ thì đưa tới trang tạo hồ sơ
+        private IActionResult ChuyenDenHoSo()
+        {
+            TempData["Error"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước.";
+            return RedirectToAction("ThongTinCaNhan", "KhachHang");
+        }
 
         // Lấy hồ sơ khách hàng của người đang đăng nhập (null nếu chưa có hồ sơ)
         private async Task<KhachHang?> LayKhachHangDangNhapAsync()
