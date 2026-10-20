@@ -7,6 +7,7 @@
 @{
     ViewData["Title"] = "Phiếu của tôi";
     string trangThaiChon = ViewData["TrangThai"] as string ?? "";
+    var danhSach = Model.ToList();
     var cacTrangThai = new[]
     {
         TrangThaiPhieu.ChoXacNhan,
@@ -17,70 +18,87 @@
     };
 }
 
-<h2 class="mb-3">Phiếu của tôi</h2>
+<h1 class="mb-1">Phiếu của tôi</h1>
+<p class="text-muted mb-4">Theo dõi các phiếu đặt phòng của bạn theo trạng thái.</p>
 
 <partial name="_ThongBao" />
 
-<form method="get" asp-action="Index" class="row g-2 mb-3">
-    <div class="col-md-4">
-        <select name="trangThai" class="form-select" onchange="this.form.submit()">
-            <option value="" selected="@(trangThaiChon == "")">Tất cả trạng thái</option>
-            @foreach (var tt in cacTrangThai)
-            {
-                <option value="@tt" selected="@(trangThaiChon == tt)">@DinhDang.TenTrangThaiPhieu(tt)</option>
-            }
-        </select>
+<div class="card mb-4">
+    <div class="card-header">Lọc phiếu</div>
+    <div class="card-body">
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label" for="trangThai">Trạng thái</label>
+                    <select id="trangThai" name="trangThai" class="form-select" onchange="this.form.submit()">
+                        <option value="" selected="@(trangThaiChon == "")">Tất cả trạng thái</option>
+                        @foreach (var tt in cacTrangThai)
+                        {
+                            <option value="@tt" selected="@(trangThaiChon == tt)">@DinhDang.TenTrangThaiPhieu(tt)</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                    <a asp-action="Index" class="btn btn-outline-primary">Đặt lại</a>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Lọc</button>
-        <a asp-action="Index" class="btn btn-outline-secondary">Bỏ lọc</a>
-    </div>
-</form>
+</div>
 
-@if (!Model.Any())
-{
-    <div class="alert alert-info">
-        @(trangThaiChon == "" ? "Bạn chưa có phiếu đặt phòng nào." : "Không có phiếu nào ở trạng thái này.")
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Danh sách phiếu</span>
+        <small class="text-muted">Hiển thị @danhSach.Count phiếu</small>
     </div>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Mã phiếu</th>
-                    <th>Phòng</th>
-                    <th>Ngày đặt</th>
-                    <th>Ngày nhận</th>
-                    <th>Ngày trả</th>
-                    <th class="text-end">Tổng tiền</th>
-                    <th>Trạng thái</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in Model)
-                {
+
+    @if (!danhSach.Any())
+    {
+        <div class="card-body">
+            <p class="text-muted mb-0">
+                @(trangThaiChon == "" ? "Bạn chưa có phiếu đặt phòng nào." : "Không có phiếu nào ở trạng thái này.")
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
                     <tr>
-                        <td>#@p.MaPhieuDat</td>
-                        <td>@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong))</td>
-                        <td>@DinhDang.Ngay(p.NgayDat)</td>
-                        <td>@DinhDang.Ngay(p.NgayNhanDuKien)</td>
-                        <td>@DinhDang.Ngay(p.NgayTraDuKien)</td>
-                        <td class="text-end">@DinhDang.Tien(p.TongTienDuKien)</td>
-                        <td>
-                            <span class="badge bg-@DinhDang.MauTrangThaiPhieu(p.TrangThai)">
-                                @DinhDang.TenTrangThaiPhieu(p.TrangThai)
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@p.MaPhieuDat"
-                               class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        </td>
+                        <th>Mã phiếu</th>
+                        <th>Phòng</th>
+                        <th>Ngày đặt</th>
+                        <th>Ngày nhận</th>
+                        <th>Ngày trả</th>
+                        <th class="text-end">Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
+                </thead>
+                <tbody>
+                    @foreach (var p in danhSach)
+                    {
+                        <tr>
+                            <td class="fw-semibold">#@p.MaPhieuDat</td>
+                            <td>@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong))</td>
+                            <td>@DinhDang.Ngay(p.NgayDat)</td>
+                            <td>@DinhDang.Ngay(p.NgayNhanDuKien)</td>
+                            <td>@DinhDang.Ngay(p.NgayTraDuKien)</td>
+                            <td class="text-end">@DinhDang.Tien(p.TongTienDuKien)</td>
+                            <td>
+                                <span class="@DinhDang.ClassTrangThaiPhieu(p.TrangThai)">
+                                    @DinhDang.TenTrangThaiPhieu(p.TrangThai)
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@p.MaPhieuDat">Chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -8,51 +8,60 @@
     var danhSach = Model.ToList();
 }
 
-<h2 class="mb-3">Lịch sử lưu trú</h2>
+<h1 class="mb-1">Lịch sử lưu trú</h1>
+<p class="text-muted mb-4">Các lần lưu trú đã hoàn tất của bạn tại khách sạn.</p>
 
 <partial name="_ThongBao" />
 
-@if (!danhSach.Any())
-{
-    <div class="alert alert-info">Bạn chưa có lần lưu trú nào đã hoàn tất.</div>
-}
-else
-{
-    <p class="text-muted">
-        Tổng cộng <strong>@danhSach.Count</strong> lần lưu trú,
-        tổng chi phí <strong>@DinhDang.Tien(danhSach.Sum(p => p.TongTienDuKien))</strong>.
-    </p>
-
-    <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-            <thead class="table-light">
-                <tr>
-                    <th>Ngày nhận</th>
-                    <th>Ngày trả</th>
-                    <th>Số đêm</th>
-                    <th>Phòng</th>
-                    <th>Loại phòng</th>
-                    <th class="text-end">Tổng tiền</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var p in danhSach)
-                {
-                    <tr>
-                        <td>@DinhDang.Ngay(p.NgayNhanDuKien)</td>
-                        <td>@DinhDang.Ngay(p.NgayTraDuKien)</td>
-                        <td>@((p.NgayTraDuKien.Date - p.NgayNhanDuKien.Date).Days)</td>
-                        <td>@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong))</td>
-                        <td>@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.LoaiPhong?.TenLoaiPhong).Distinct())</td>
-                        <td class="text-end">@DinhDang.Tien(p.TongTienDuKien)</td>
-                        <td class="text-end">
-                            <a asp-action="Details" asp-route-id="@p.MaPhieuDat"
-                               class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Các lần lưu trú</span>
+        @if (danhSach.Any())
+        {
+            <small class="text-muted">
+                @danhSach.Count lần lưu trú, tổng chi phí @DinhDang.Tien(danhSach.Sum(p => p.TongTienDuKien))
+            </small>
+        }
     </div>
-}
+
+    @if (!danhSach.Any())
+    {
+        <div class="card-body">
+            <p class="text-muted mb-0">Bạn chưa có lần lưu trú nào đã hoàn tất.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Ngày nhận</th>
+                        <th>Ngày trả</th>
+                        <th class="text-end">Số đêm</th>
+                        <th>Phòng</th>
+                        <th>Loại phòng</th>
+                        <th class="text-end">Tổng tiền</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in danhSach)
+                    {
+                        <tr>
+                            <td>@DinhDang.Ngay(p.NgayNhanDuKien)</td>
+                            <td>@DinhDang.Ngay(p.NgayTraDuKien)</td>
+                            <td class="text-end">@((p.NgayTraDuKien.Date - p.NgayNhanDuKien.Date).Days)</td>
+                            <td class="fw-semibold">@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong))</td>
+                            <td>@string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.LoaiPhong?.TenLoaiPhong).Distinct())</td>
+                            <td class="text-end">@DinhDang.Tien(p.TongTienDuKien)</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@p.MaPhieuDat">Chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

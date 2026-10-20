@@ -28,9 +28,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="LoaiPhong" asp-action="Index">Loai phong</a> @* Module 1 - Liem *@
                         </li>
+                        @if (Context.Session.GetString("VaiTro") != "Admin")
+{
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="DatPhong" asp-action="Index">Dat phong</a> @* Module 3 - Cuong *@
                         </li>
+}
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="PhieuDatPhong" asp-action="Index">Phieu dat phong</a> @* Module 4 - Duc *@
                         </li>

@@ -7,59 +7,67 @@
     ViewData["Title"] = "Chi tiết phiếu đặt phòng";
 }
 
-<h2 class="mb-3">Phiếu đặt phòng #@Model.MaPhieuDat</h2>
+<h1 class="mb-1">Phiếu đặt phòng #@Model.MaPhieuDat</h1>
+<p class="text-muted mb-4">Thông tin chi tiết và các phòng trong phiếu đặt của bạn.</p>
 
 <partial name="_ThongBao" />
 
-<dl class="row">
-    <dt class="col-sm-3">Khách hàng</dt>
-    <dd class="col-sm-9">@Model.KhachHang?.HoTen</dd>
+<div class="card mb-4">
+    <div class="card-header">Thông tin phiếu</div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Khách hàng</dt>
+            <dd class="col-sm-9">@Model.KhachHang?.HoTen</dd>
 
-    <dt class="col-sm-3">Ngày đặt</dt>
-    <dd class="col-sm-9">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</dd>
+            <dt class="col-sm-3">Ngày đặt</dt>
+            <dd class="col-sm-9">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</dd>
 
-    <dt class="col-sm-3">Ngày nhận dự kiến</dt>
-    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayNhanDuKien)</dd>
+            <dt class="col-sm-3">Ngày nhận dự kiến</dt>
+            <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayNhanDuKien)</dd>
 
-    <dt class="col-sm-3">Ngày trả dự kiến</dt>
-    <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayTraDuKien)</dd>
+            <dt class="col-sm-3">Ngày trả dự kiến</dt>
+            <dd class="col-sm-9">@DinhDang.Ngay(Model.NgayTraDuKien)</dd>
 
-    <dt class="col-sm-3">Trạng thái</dt>
-    <dd class="col-sm-9">
-        <span class="badge bg-@DinhDang.MauTrangThaiPhieu(Model.TrangThai)">
-            @DinhDang.TenTrangThaiPhieu(Model.TrangThai)
-        </span>
-    </dd>
+            <dt class="col-sm-3">Trạng thái</dt>
+            <dd class="col-sm-9">
+                <span class="@DinhDang.ClassTrangThaiPhieu(Model.TrangThai)">
+                    @DinhDang.TenTrangThaiPhieu(Model.TrangThai)
+                </span>
+            </dd>
 
-    <dt class="col-sm-3">Tổng tiền dự kiến</dt>
-    <dd class="col-sm-9"><strong>@DinhDang.Tien(Model.TongTienDuKien)</strong></dd>
-</dl>
-
-<h4 class="mt-4">Chi tiết phòng</h4>
-<div class="table-responsive">
-    <table class="table table-striped align-middle">
-        <thead class="table-light">
-            <tr>
-                <th>Số phòng</th>
-                <th>Loại phòng</th>
-                <th class="text-end">Đơn giá / đêm</th>
-                <th class="text-end">Số đêm</th>
-                <th class="text-end">Thành tiền</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var ct in Model.ChiTietDatPhongs)
-            {
-                <tr>
-                    <td>@ct.Phong?.SoPhong</td>
-                    <td>@ct.Phong?.LoaiPhong?.TenLoaiPhong</td>
-                    <td class="text-end">@DinhDang.Tien(ct.DonGiaDem)</td>
-                    <td class="text-end">@ct.SoDem</td>
-                    <td class="text-end">@DinhDang.Tien(ct.ThanhTien)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+            <dt class="col-sm-3">Tổng tiền dự kiến</dt>
+            <dd class="col-sm-9 fw-semibold">@DinhDang.Tien(Model.TongTienDuKien)</dd>
+        </dl>
+    </div>
 </div>
 
-<a asp-action="Index" class="btn btn-secondary mt-2">Quay lại phiếu của tôi</a>
+<div class="card mb-4">
+    <div class="card-header">Chi tiết phòng</div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Số phòng</th>
+                    <th>Loại phòng</th>
+                    <th class="text-end">Đơn giá mỗi đêm</th>
+                    <th class="text-end">Số đêm</th>
+                    <th class="text-end">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ct in Model.ChiTietDatPhongs)
+                {
+                    <tr>
+                        <td class="fw-semibold">@ct.Phong?.SoPhong</td>
+                        <td>@ct.Phong?.LoaiPhong?.TenLoaiPhong</td>
+                        <td class="text-end">@DinhDang.Tien(ct.DonGiaDem)</td>
+                        <td class="text-end">@ct.SoDem</td>
+                        <td class="text-end">@DinhDang.Tien(ct.ThanhTien)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-outline-primary">Quay lại phiếu của tôi</a>
