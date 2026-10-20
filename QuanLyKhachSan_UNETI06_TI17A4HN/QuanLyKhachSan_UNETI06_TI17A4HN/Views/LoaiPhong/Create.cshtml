@@ -1,0 +1,28 @@
+﻿@* Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281] *@
+@* Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng *@
+@* Nội dung: Form thêm loại phòng *@
+@model LoaiPhong
+@{
+    ViewData["Title"] = "Thêm loại phòng";
+}
+
+<h1 class="h3 mb-3">Thêm loại phòng</h1>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">Thông tin loại phòng</div>
+            <div class="card-body">
+                <form asp-action="Create" method="post">
+                    <partial name="_FormLoaiPhong" model="Model" />
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
