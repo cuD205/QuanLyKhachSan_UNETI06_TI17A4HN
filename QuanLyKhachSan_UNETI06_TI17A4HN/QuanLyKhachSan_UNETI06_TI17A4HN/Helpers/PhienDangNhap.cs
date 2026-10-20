@@ -1,31 +1,53 @@
-﻿// Họ và tên: Đinh Ngọc Cường
-// Mã sinh viên: 23103100260
-// Nội dung thực hiện: Hằng key Session và hàm đọc Session dùng cho Module 3
+﻿// Sinh viên: [Nguyen Thanh Liem] - MSSV: [23103100281]
+// Module: Module 1 - Tài khoản, đăng nhập, phân quyền, quản lý loại phòng
+// Nội dung: Lưu / đọc thông tin đăng nhập trong Session (Mã tài khoản, Họ tên, Vai trò) - cả nhóm dùng chung
+using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
+
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
 {
-    // Tên các key Session. Nếu Module 1 đặt tên khác thì chỉ cần sửa tại đây.
-    public static class SessionKeys
+    public static class PhienDangNhap
     {
-        public const string MaTaiKhoan = "MaTaiKhoan";
-        public const string HoTen = "HoTen";
-        public const string VaiTro = "VaiTro";
+        public const string KeyMaTaiKhoan = "MaTaiKhoan";
+        public const string KeyHoTen = "HoTen";
+        public const string KeyVaiTro = "VaiTro";
 
-        // Trang đăng nhập của Module 1 (sửa lại cho đúng khi Module 1 xong)
-        public const string DuongDanDangNhap = "/TaiKhoan/DangNhap";
-    }
+        // Lưu tối thiểu Mã tài khoản, Họ tên, Vai trò vào Session (theo yêu cầu đề bài)
+        public static void LuuDangNhap(this ISession session, TaiKhoan taiKhoan)
+        {
+            session.SetInt32(KeyMaTaiKhoan, taiKhoan.MaTaiKhoan);
+            session.SetString(KeyHoTen, taiKhoan.HoTen);
+            session.SetString(KeyVaiTro, taiKhoan.VaiTro);
+        }
 
-    public static class PhienDangNhapExtensions
-    {
-        // Mã tài khoản đang đăng nhập (null nếu chưa đăng nhập)
+        public static bool DaDangNhap(this ISession session)
+        {
+            return session.GetInt32(KeyMaTaiKhoan).HasValue;
+        }
+
         public static int? LayMaTaiKhoan(this ISession session)
         {
-            return session.GetInt32(SessionKeys.MaTaiKhoan);
+            return session.GetInt32(KeyMaTaiKhoan);
+        }
+
+        public static string? LayHoTen(this ISession session)
+        {
+            return session.GetString(KeyHoTen);
         }
 
         // Vai trò đang đăng nhập (null nếu chưa đăng nhập)
         public static string? LayVaiTro(this ISession session)
         {
-            return session.GetString(SessionKeys.VaiTro);
+            return session.GetString(KeyVaiTro);
+        }
+
+        public static bool LaAdmin(this ISession session)
+        {
+            return session.GetString(KeyVaiTro) == VaiTro.Admin;
+        }
+
+        public static bool LaKhachHang(this ISession session)
+        {
+            return session.GetString(KeyVaiTro) == VaiTro.KhachHang;
         }
     }
 }
