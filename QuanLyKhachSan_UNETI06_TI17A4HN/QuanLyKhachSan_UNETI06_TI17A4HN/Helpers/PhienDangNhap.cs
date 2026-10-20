@@ -34,7 +34,6 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
             return session.GetString(KeyHoTen);
         }
 
-        // Vai trò đang đăng nhập (null nếu chưa đăng nhập)
         public static string? LayVaiTro(this ISession session)
         {
             return session.GetString(KeyVaiTro);

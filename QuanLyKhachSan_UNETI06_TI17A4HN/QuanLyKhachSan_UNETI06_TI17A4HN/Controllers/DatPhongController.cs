@@ -8,11 +8,12 @@ using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
 using QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels;
+using QuanLyKhachSan_UNETI06_TI17A4HN.Filters;
 
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 {
     // Toàn bộ controller này chỉ dành cho khách hàng đã đăng nhập
-    [YeuCauVaiTro(VaiTro.KhachHang)]
+    [PhanQuyen(VaiTro.KhachHang)]
     public class DatPhongController : Controller
     {
         private readonly ApplicationDbContext _context;

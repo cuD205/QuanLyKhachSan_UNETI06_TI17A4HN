@@ -7,6 +7,7 @@ using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
 using QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels;
+using QuanLyKhachSan_UNETI06_TI17A4HN.Filters;
 
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 {
@@ -22,7 +23,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         // ===== PHẦN DÀNH CHO ADMIN =====
 
         // Danh sách + tìm kiếm theo họ tên / SĐT / email / CCCD
-        [YeuCauVaiTro(VaiTro.Admin)]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Index(string? tuKhoa)
         {
             // AsNoTracking: chỉ đọc, không cần EF theo dõi thay đổi
@@ -47,7 +48,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // Chi tiết một khách hàng kèm các phiếu đặt phòng của họ
-        [YeuCauVaiTro(VaiTro.Admin)]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -66,7 +67,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         // Khóa / mở khóa khách hàng (đảo trạng thái)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [YeuCauVaiTro(VaiTro.Admin)]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> DoiTrangThai(int id)
         {
             var khachHang = await _context.KhachHangs.FindAsync(id);
@@ -85,7 +86,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
         // Xem thông tin cá nhân của chính mình
         [HttpGet]
-        [YeuCauVaiTro(VaiTro.KhachHang)]
+        [PhanQuyen(VaiTro.KhachHang)]
         public async Task<IActionResult> ThongTinCaNhan()
         {
             // Mã tài khoản lấy từ Session, KHÔNG nhận từ URL hay form
@@ -127,7 +128,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         // Lưu thông tin cá nhân (tạo hồ sơ mới nếu chưa có)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [YeuCauVaiTro(VaiTro.KhachHang)]
+        [PhanQuyen(VaiTro.KhachHang)]
         public async Task<IActionResult> ThongTinCaNhan(ThongTinCaNhanViewModel model)
         {
             int maTaiKhoan = HttpContext.Session.LayMaTaiKhoan()!.Value;

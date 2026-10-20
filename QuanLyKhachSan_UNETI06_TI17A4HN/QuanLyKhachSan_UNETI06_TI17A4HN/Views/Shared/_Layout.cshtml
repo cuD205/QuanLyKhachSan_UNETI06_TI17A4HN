@@ -55,6 +55,18 @@
                                 <a class="nav-link" asp-controller="ThongKe" asp-action="Dashboard">Dashboard</a> @* Module 4 - Đức *@
                             </li>
                         }
+                        @if (laAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="KhachHang" asp-action="Index">Khách hàng</a> @* Module 3 - Cường *@
+                            </li>
+                        }
+                        @if (laKhachHang)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="KhachHang" asp-action="ThongTinCaNhan">Thông tin cá nhân</a> @* Module 3 - Cường *@
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav align-items-lg-center">
                         @if (daDangNhap)
