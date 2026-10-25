@@ -1,0 +1,93 @@
+@* Sinh viên: Dương Minh Đức - MSSV: 23103100282 *@
+@* Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê *@
+@* Nội dung: Chi tiết phiếu đặt phòng (thông tin phiếu, khách hàng, danh sách phòng và thành tiền) *@
+@model PhieuDatPhong
+@{
+    ViewData["Title"] = $"Phiếu đặt phòng #{Model.MaPhieuDat}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Phiếu đặt phòng #@Model.MaPhieuDat</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Quay lại danh sách</a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Thông tin phiếu</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Trạng thái</dt>
+                    <dd class="col-sm-7"><partial name="_TrangThaiPhieuBadge" model="Model.TrangThai" /></dd>
+
+                    <dt class="col-sm-5">Ngày đặt</dt>
+                    <dd class="col-sm-7">@Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-5">Ngày nhận dự kiến</dt>
+                    <dd class="col-sm-7">@Model.NgayNhanDuKien.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-5">Ngày trả dự kiến</dt>
+                    <dd class="col-sm-7">@Model.NgayTraDuKien.ToString("dd/MM/yyyy")</dd>
+
+                    <dt class="col-sm-5">Tổng tiền dự kiến</dt>
+                    <dd class="col-sm-7 fw-bold">@Model.TongTienDuKien.ToTien()</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">Khách hàng</div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Họ tên</dt>
+                    <dd class="col-sm-8">@Model.KhachHang?.HoTen</dd>
+
+                    <dt class="col-sm-4">Điện thoại</dt>
+                    <dd class="col-sm-8">@Model.KhachHang?.SoDienThoai</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.KhachHang?.Email</dd>
+
+                    <dt class="col-sm-4">CCCD</dt>
+                    <dd class="col-sm-8">@Model.KhachHang?.CCCD</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Chi tiết phòng đặt</div>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Phòng</th>
+                    <th>Loại phòng</th>
+                    <th class="text-end">Đơn giá / đêm</th>
+                    <th class="text-center">Số đêm</th>
+                    <th class="text-end">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ct in Model.ChiTietDatPhongs)
+                {
+                    <tr>
+                        <td>@ct.Phong?.SoPhong</td>
+                        <td>@ct.Phong?.LoaiPhong?.TenLoaiPhong</td>
+                        <td class="text-end">@ct.DonGiaDem.ToTien()</td>
+                        <td class="text-center">@ct.SoDem</td>
+                        <td class="text-end">@ct.ThanhTien.ToTien()</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Tổng cộng</th>
+                    <th class="text-end">@Model.ChiTietDatPhongs.Sum(c => c.ThanhTien).ToTien()</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

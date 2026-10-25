@@ -1,0 +1,16 @@
+@* Sinh viên: Dương Minh Đức - MSSV: 23103100282 *@
+@* Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê *@
+@* Nội dung: Partial hiển thị nhãn trạng thái phiếu đặt (dùng: <partial name="_TrangThaiPhieuBadge" model="item.TrangThai" />) *@
+@model string
+@{
+    var (css, nhan) = Model switch
+    {
+        TrangThaiPhieu.ChoXacNhan  => ("badge-choxacnhan", "Chờ xác nhận"),
+        TrangThaiPhieu.DaXacNhan   => ("badge-daxacnhan", "Đã xác nhận"),
+        TrangThaiPhieu.DaNhanPhong => ("badge-danhanphong", "Đã nhận phòng"),
+        TrangThaiPhieu.DaTraPhong  => ("badge-datraphong", "Đã trả phòng"),
+        TrangThaiPhieu.DaHuy       => ("badge-dahuy", "Đã hủy"),
+        _                          => ("badge-tamngung", Model)
+    };
+}
+<span class="badge badge-trangthai @css">@nhan</span>

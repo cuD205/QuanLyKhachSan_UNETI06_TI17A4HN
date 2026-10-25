@@ -1,0 +1,93 @@
+@* Sinh viên: Dương Minh Đức - MSSV: 23103100282 *@
+@* Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê *@
+@* Nội dung: Danh sách phiếu đặt phòng (tìm theo tên khách, lọc trạng thái, lọc ngày nhận dự kiến) *@
+@model PhieuDatPhongIndexViewModel
+@{
+    ViewData["Title"] = "Quản lý phiếu đặt phòng";
+    var trangThaiList = new (string Ma, string Nhan)[]
+    {
+        (TrangThaiPhieu.ChoXacNhan, "Chờ xác nhận"),
+        (TrangThaiPhieu.DaXacNhan, "Đã xác nhận"),
+        (TrangThaiPhieu.DaNhanPhong, "Đã nhận phòng"),
+        (TrangThaiPhieu.DaTraPhong, "Đã trả phòng"),
+        (TrangThaiPhieu.DaHuy, "Đã hủy")
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Quản lý phiếu đặt phòng</h1>
+    <span class="text-muted">@Model.DanhSach.Count phiếu</span>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" asp-action="Index" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small mb-1">Tên khách hàng</label>
+                <input type="text" name="tuKhoa" value="@Model.TuKhoa" class="form-control" placeholder="Tìm theo tên khách..." />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1">Trạng thái</label>
+                <select name="trangThai" class="form-select">
+                    <option value="" selected="@string.IsNullOrEmpty(Model.TrangThai)">Tất cả</option>
+                    @foreach (var tt in trangThaiList)
+                    {
+                        <option value="@tt.Ma" selected="@(Model.TrangThai == tt.Ma)">@tt.Nhan</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1">Nhận dự kiến từ</label>
+                <input type="date" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small mb-1">Đến ngày</label>
+                <input type="date" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Mã phiếu</th>
+                <th>Khách hàng</th>
+                <th>Phòng</th>
+                <th>Ngày nhận dự kiến</th>
+                <th>Ngày trả dự kiến</th>
+                <th class="text-end">Tổng tiền dự kiến</th>
+                <th>Trạng thái</th>
+                <th style="width: 110px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DanhSach)
+            {
+                <tr>
+                    <td>#@item.MaPhieuDat</td>
+                    <td>@item.KhachHang?.HoTen</td>
+                    <td>@string.Join(", ", item.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong))</td>
+                    <td>@item.NgayNhanDuKien.ToString("dd/MM/yyyy")</td>
+                    <td>@item.NgayTraDuKien.ToString("dd/MM/yyyy")</td>
+                    <td class="text-end">@item.TongTienDuKien.ToTien()</td>
+                    <td><partial name="_TrangThaiPhieuBadge" model="item.TrangThai" /></td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MaPhieuDat" class="btn btn-sm btn-secondary">Chi tiết</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.DanhSach.Any())
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">Không tìm thấy phiếu đặt phòng nào.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
