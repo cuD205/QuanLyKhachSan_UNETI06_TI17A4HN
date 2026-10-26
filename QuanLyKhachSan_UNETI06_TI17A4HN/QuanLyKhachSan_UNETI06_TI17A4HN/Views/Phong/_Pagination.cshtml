@@ -1,0 +1,61 @@
+﻿@* Họ và tên: [Dien] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Phân trang danh sách phòng, giữ điều kiện tìm kiếm, lọc, sắp xếp *@
+@model PhongIndexViewModel
+@functions {
+    // Gom toàn bộ điều kiện đang dùng để giữ nguyên khi chuyển trang
+    Dictionary<string, string> Route(int page)
+    {
+        var d = new Dictionary<string, string>
+        {
+            ["page"] = page.ToString(),
+            ["pageSize"] = Model.PageSize.ToString(),
+            ["sapXep"] = Model.SapXep
+        };
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+        if (!string.IsNullOrEmpty(Model.Search)) d["search"] = Model.Search;
+        if (Model.MaLoaiPhong.HasValue) d["maLoaiPhong"] = Model.MaLoaiPhong.Value.ToString();
+        if (Model.Tang.HasValue) d["tang"] = Model.Tang.Value.ToString();
+        if (!string.IsNullOrEmpty(Model.TrangThai)) d["trangThai"] = Model.TrangThai;
+        if (Model.GiaTu.HasValue) d["giaTu"] = Model.GiaTu.Value.ToString(inv);
+        if (Model.GiaDen.HasValue) d["giaDen"] = Model.GiaDen.Value.ToString(inv);
+        return d;
+    }
+}
+@if (Model.TotalPages > 1)
+{
+    int batDau = Math.Max(1, Model.Page - 2);
+    int ketThuc = Math.Min(Model.TotalPages, Model.Page + 2);
+    <nav aria-label="Phân trang">
+        <ul class="pagination justify-content-center flex-wrap">
+            <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+                <a class="page-link" asp-action="Index" asp-all-route-data="Route(Model.Page - 1)">Trang trước</a>
+            </li>
+            @if (batDau > 1)
+            {
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="Route(1)">1</a></li>
+                @if (batDau > 2)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+            }
+            @for (int p = batDau; p <= ketThuc; p++)
+            {
+                <li class="page-item @(p == Model.Page ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-all-route-data="Route(p)">@p</a>
+                </li>
+            }
+            @if (ketThuc < Model.TotalPages)
+            {
+                @if (ketThuc < Model.TotalPages - 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">…</span></li>
+                }
+                <li class="page-item"><a class="page-link" asp-action="Index" asp-all-route-data="Route(Model.TotalPages)">@Model.TotalPages</a></li>
+            }
+            <li class="page-item @(Model.HasNext ? "" : "disabled")">
+                <a class="page-link" asp-action="Index" asp-all-route-data="Route(Model.Page + 1)">Trang sau</a>
+            </li>
+        </ul>
+    </nav>
+}

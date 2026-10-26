@@ -1,6 +1,6 @@
-﻿@* Họ và tên: [Họ tên đầy đủ] *@
-@* Mã sinh viên: [MSSV] *@
-@* Nội dung thực hiện: CRUD phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp *@
+﻿@* Họ và tên: [Dien] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp và phân trang *@
 @model PhongIndexViewModel
 @{
     ViewData["Title"] = "Danh sách phòng";
@@ -66,6 +66,10 @@
                     <label class="form-label" for="sapXep">Sắp xếp</label>
                     <select class="form-select" id="sapXep" name="sapXep" asp-items="Model.SapXepOptions"></select>
                 </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pageSize">Hiển thị</label>
+                    <select class="form-select" id="pageSize" name="pageSize" asp-items="Model.PageSizeOptions"></select>
+                </div>
             </div>
             <div class="mt-3">
                 <button type="submit" class="btn btn-primary">Tìm và lọc</button>
@@ -74,6 +78,10 @@
         </form>
     </div>
 </div>
+
+<p class="text-muted">
+    Tìm thấy <strong>@Model.TotalItems</strong> phòng. Trang @Model.Page / @Model.TotalPages.
+</p>
 
 <div class="table-responsive">
     <table class="table">
@@ -138,3 +146,5 @@
         </tbody>
     </table>
 </div>
+
+<partial name="_Pagination" model="Model" />

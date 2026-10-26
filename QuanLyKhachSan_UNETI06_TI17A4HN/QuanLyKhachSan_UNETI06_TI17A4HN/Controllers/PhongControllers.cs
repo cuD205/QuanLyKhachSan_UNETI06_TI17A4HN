@@ -1,6 +1,6 @@
-﻿// Họ và tên: [Họ tên đầy đủ]
-// Mã sinh viên: [MSSV]
-// Nội dung thực hiện: CRUD phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp
+﻿// Họ và tên: [Dien]
+// Mã sinh viên: [23103100254]
+// Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp và phân trang
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -14,6 +14,8 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
     public class PhongController : Controller
     {
         private readonly ApplicationDbContext _context;
+
+        private static readonly int[] PageSizes = { 5, 10, 20, 50 };
 
         // ===== PHÂN QUYỀN (chờ Module 1 của Liêm) =====
         // Khi Liêm merge xong đăng nhập: đổi KiemTraAdmin = true và sửa SessionVaiTro
@@ -35,9 +37,10 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             base.OnActionExecuting(context);
         }
 
-        // ===== DANH SÁCH: tìm kiếm + lọc + sắp xếp =====
+        // ===== DANH SÁCH: tìm kiếm + lọc + sắp xếp + phân trang =====
         public async Task<IActionResult> Index(string? search, int? maLoaiPhong, int? tang,
-            string? trangThai, decimal? giaTu, decimal? giaDen, string? sapXep)
+            string? trangThai, decimal? giaTu, decimal? giaDen, string? sapXep,
+            int page = 1, int pageSize = 10)
         {
             // Nếu nhập ngược khoảng giá thì đổi chỗ
             if (giaTu.HasValue && giaDen.HasValue && giaTu > giaDen)
@@ -46,8 +49,10 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             }
             if (string.IsNullOrWhiteSpace(trangThai) || !DanhSachTrangThai().ContainsKey(trangThai)) trangThai = null;
             if (string.IsNullOrWhiteSpace(sapXep) || !DanhSachSapXep().ContainsKey(sapXep)) sapXep = "sophong_tang";
+            if (!PageSizes.Contains(pageSize)) pageSize = 10;
             search = string.IsNullOrWhiteSpace(search) ? null : search.Trim();
 
+            // Truy vấn dữ liệu
             var query = _context.Phongs.AsNoTracking().Include(p => p.LoaiPhong).AsQueryable();
 
             // Tìm kiếm theo Số phòng và Tên loại phòng
@@ -64,7 +69,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             if (giaTu.HasValue) query = query.Where(p => p.DonGiaDem >= giaTu.Value);
             if (giaDen.HasValue) query = query.Where(p => p.DonGiaDem <= giaDen.Value);
 
-            // Sắp xếp (luôn có ThenBy để thứ tự ổn định)
+            // Sắp xếp (luôn có ThenBy để thứ tự ổn định khi phân trang)
             IOrderedQueryable<Phong> sorted = sapXep switch
             {
                 "sophong_giam" => query.OrderByDescending(p => p.SoPhong.Length).ThenByDescending(p => p.SoPhong),
@@ -75,7 +80,12 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 _ => query.OrderBy(p => p.SoPhong.Length).ThenBy(p => p.SoPhong),
             };
 
-            var phongs = await sorted.ToListAsync();
+            // Phân trang bằng Skip()/Take(), xử lý đúng trang đầu/cuối
+            int totalItems = await sorted.CountAsync();
+            int totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+            page = Math.Clamp(page, 1, totalPages);
+
+            var phongs = await sorted.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
             var vm = new PhongIndexViewModel
             {
@@ -86,7 +96,11 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 TrangThai = trangThai,
                 GiaTu = giaTu,
                 GiaDen = giaDen,
-                SapXep = sapXep
+                SapXep = sapXep,
+                Page = page,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = totalPages
             };
 
             var loaiPhongs = await _context.LoaiPhongs.AsNoTracking().OrderBy(l => l.TenLoaiPhong).ToListAsync();
@@ -105,6 +119,10 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             vm.SapXepOptions = DanhSachSapXep()
                 .Select(kv => new SelectListItem(kv.Value, kv.Key, kv.Key == sapXep))
+                .ToList();
+
+            vm.PageSizeOptions = PageSizes
+                .Select(s => new SelectListItem($"{s} phòng/trang", s.ToString(), s == pageSize))
                 .ToList();
 
             return View(vm);
