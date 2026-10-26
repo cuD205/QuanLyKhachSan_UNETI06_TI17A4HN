@@ -1,48 +1,84 @@
-@*  Ho va ten: Duong Minh Duc | Ma sinh vien: 23103100282
-    Noi dung thuc hien: Navbar va layout dung chung, ap dung theme site.css *@
+@*  Họ và tên: Dương Minh Đức | Mã sinh viên: 23103100282
+    Nội dung thực hiện: Navbar và layout dùng chung, áp dụng theme site.css
+    Cập nhật Module 1: menu theo Session/vai trò, nút đăng nhập - đăng xuất, khu vực thông báo (TempData) *@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Khach San UNETI06</title>
+    <title>@ViewData["Title"] - Khách sạn UNETI06</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        // Module 1: hiển thị menu theo trạng thái đăng nhập và vai trò lưu trong Session.
+        // Lưu ý: ẩn menu chỉ để gọn giao diện, quyền thật sự được kiểm tra ở Controller bằng [PhanQuyen].
+        var session = Context.Session;
+        var daDangNhap = session.DaDangNhap();
+        var laAdmin = session.LaAdmin();
+        var laKhachHang = session.LaKhachHang();
+    }
     <header>
         <nav class="navbar navbar-expand-lg navbar-main navbar-dark">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                    Khach San UNETI06
+                    Khách sạn UNETI06
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navMenu">
                     <ul class="navbar-nav me-auto">
-                        @* Moi link ung voi 1 Module - 4 ban tu bo sung Controller/Action dung ten minh dat *@
+                        @* Mỗi link ứng với 1 Module - 4 bạn tự bổ sung Controller/Action đúng tên mình đặt *@
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Phong" asp-action="Index">Phong</a> @* Module 2 - Dien *@
+                            <a class="nav-link" asp-controller="Phong" asp-action="Index">Phòng</a> @* Module 2 - Điền *@
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="LoaiPhong" asp-action="Index">Loai phong</a> @* Module 1 - Liem *@
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="DatPhong" asp-action="Index">Dat phong</a> @* Module 3 - Cuong *@
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="PhieuDatPhong" asp-action="Index">Phieu dat phong</a> @* Module 4 - Duc *@
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="ThongKe" asp-action="Dashboard">Dashboard</a> @* Module 4 - Duc *@
-                        </li>
+                        @if (laAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="LoaiPhong" asp-action="Index">Loại phòng</a> @* Module 1 - Liêm *@
+                            </li>
+                        }
+                        @if (laKhachHang)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="DatPhong" asp-action="Index">Đặt phòng</a> @* Module 3 - Cường *@
+                            </li>
+                        }
+                        @if (laAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="PhieuDatPhong" asp-action="Index">Phiếu đặt phòng</a> @* Module 4 - Đức *@
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ThongKe" asp-action="Dashboard">Dashboard</a> @* Module 4 - Đức *@
+                            </li>
+                        }
                     </ul>
-                    <ul class="navbar-nav">
-                        @* Hien thi theo Session - Liem code phan nay khi lam dang nhap/dang xuat *@
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangNhap">Dang nhap</a>
-                        </li>
+                    <ul class="navbar-nav align-items-lg-center">
+                        @if (daDangNhap)
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text text-white me-lg-3">
+                                    Xin chào, <strong>@session.LayHoTen()</strong> (@(laAdmin ? "Admin" : "Khách hàng"))
+                                </span>
+                            </li>
+                            <li class="nav-item">
+                                <form asp-controller="TaiKhoan" asp-action="DangXuat" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-accent btn-sm">Đăng xuất</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="TaiKhoan" asp-action="DangKy">Đăng ký</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-accent btn-sm" asp-controller="TaiKhoan" asp-action="DangNhap">Đăng nhập</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -51,13 +87,27 @@
 
     <div class="container" style="margin-top: 24px; margin-bottom: 48px;">
         <main role="main">
+            @if (TempData["ThanhCong"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @TempData["ThanhCong"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                </div>
+            }
+            @if (TempData["Loi"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["Loi"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+                </div>
+            }
             @RenderBody()
         </main>
     </div>
 
     <footer class="border-top footer text-muted" style="padding: 16px 0; text-align:center;">
         <div class="container">
-            &copy; 2026 - Nhom 06 - De tai 05: Quan ly Khach san va Dat phong
+            &copy; 2026 - Nhóm 06 - Đề tài 05: Quản lý Khách sạn và Đặt phòng
         </div>
     </footer>
 

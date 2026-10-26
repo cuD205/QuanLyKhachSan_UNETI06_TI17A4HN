@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,15 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+var cultureBinding = new CultureInfo("en-US");
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(cultureBinding),
+    SupportedCultures = new List<CultureInfo> { cultureBinding },
+    SupportedUICultures = new List<CultureInfo> { cultureBinding }
+});
+
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
