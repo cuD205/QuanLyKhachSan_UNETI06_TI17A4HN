@@ -1,11 +1,13 @@
-﻿@* Module 2 - Diện: badge trạng thái Phòng, dùng class của theme chung *@
+﻿@* Họ và tên: Đoàn Xuân Diện *@
+@* Mã sinh viên: 23103100254 *@
+@* Nội dung thực hiện: Hiển thị badge trạng thái phòng *@
 @model string
 @{
     var (cls, text) = Model switch
     {
         TrangThaiPhong.SanSang => ("badge-sansang", "Sẵn sàng"),
         TrangThaiPhong.DangSuDung => ("badge-dangsudung", "Đang sử dụng"),
-        TrangThaiPhong.TamNgung => ("badge-tamngung", "Tạm ngưng"),
+        TrangThaiPhong.TamNgung => ("badge-tamngung", "Tạm ngừng"),
         _ => ("bg-secondary", Model)
     };
 }

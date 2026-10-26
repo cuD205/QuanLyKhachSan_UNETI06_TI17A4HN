@@ -1,40 +1,26 @@
-﻿// Họ và tên: [Dien]
-// Mã sinh viên: [23103100254]
-// Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp và phân trang
-using Microsoft.AspNetCore.Http;
+﻿// Họ và tên: Đoàn Xuân Diện
+// Mã sinh viên: 23103100254
+// Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp, phân trang và phân quyền
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
+using QuanLyKhachSan_UNETI06_TI17A4HN.Filters;
+using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
 
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 {
+    [PhanQuyen]
     public class PhongController : Controller
     {
         private readonly ApplicationDbContext _context;
 
         private static readonly int[] PageSizes = { 5, 10, 20, 50 };
 
-        // ===== PHÂN QUYỀN (chờ Module 1 của Liêm) =====
-        // Khi Liêm merge xong đăng nhập: đổi KiemTraAdmin = true và sửa SessionVaiTro
-        // cho đúng tên key Session mà Liêm lưu vai trò.
-        private static readonly bool KiemTraAdmin = false;
-        private const string SessionVaiTro = "VaiTro";
-
         public PhongController(ApplicationDbContext context)
         {
             _context = context;
-        }
-
-        private bool LaAdmin() =>
-            !KiemTraAdmin || HttpContext.Session.GetString(SessionVaiTro) == VaiTro.Admin;
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            ViewBag.LaAdmin = LaAdmin();
-            base.OnActionExecuting(context);
         }
 
         // ===== DANH SÁCH: tìm kiếm + lọc + sắp xếp + phân trang =====
@@ -143,19 +129,18 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== THÊM =====
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Create()
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
             await NapDanhSachChon(null);
             return View(new Phong());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Create([Bind("SoPhong,MaLoaiPhong,Tang,DonGiaDem,MoTa,TrangThai")] Phong phong)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
-
             ModelState.Remove(nameof(Phong.LoaiPhong));
             phong.SoPhong = (phong.SoPhong ?? string.Empty).Trim();
             await KiemTraNghiepVu(phong, null);
@@ -182,10 +167,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         // ===== CẬP NHẬT TRẠNG THÁI =====
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> CapNhatTrangThai(int id, string trangThai, string? returnUrl)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
-
             var phong = await _context.Phongs.FindAsync(id);
             if (phong == null) return NotFound();
 
@@ -218,9 +202,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== SỬA =====
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
             if (id == null) return NotFound();
 
             var phong = await _context.Phongs.FindAsync(id);
@@ -232,9 +216,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Edit(int id, [Bind("MaPhong,SoPhong,MaLoaiPhong,Tang,DonGiaDem,MoTa,TrangThai")] Phong phong)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
             if (id != phong.MaPhong) return NotFound();
 
             ModelState.Remove(nameof(Phong.LoaiPhong));
@@ -271,9 +255,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== XÓA =====
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
             if (id == null) return NotFound();
 
             var phong = await _context.Phongs.AsNoTracking()
@@ -287,10 +271,9 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [PhanQuyen(VaiTro.Admin)]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (!LaAdmin()) return TuChoiTruyCap();
-
             var phong = await _context.Phongs.FindAsync(id);
             if (phong == null) return RedirectToAction(nameof(Index));
 
@@ -317,13 +300,6 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         }
 
         // ===== HÀM PHỤ =====
-        private IActionResult TuChoiTruyCap()
-        {
-            // Chưa có trang đăng nhập thì về trang chủ; sau này đổi sang TaiKhoan/DangNhap
-            TempData["Error"] = "Bạn cần đăng nhập bằng tài khoản Admin để thực hiện thao tác này.";
-            return RedirectToAction("Index", "Home");
-        }
-
         private async Task KiemTraNghiepVu(Phong phong, int? boQuaMaPhong)
         {
             if (!DanhSachTrangThai().ContainsKey(phong.TrangThai ?? string.Empty))

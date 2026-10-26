@@ -1,11 +1,10 @@
-﻿@* Họ và tên: [Dien] *@
-@* Mã sinh viên: [23103100254] *@
+﻿@* Họ và tên: Đoàn Xuân Diện *@
+@* Mã sinh viên: 23103100254 *@
 @* Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp và phân trang *@
 @model PhongIndexViewModel
 @{
     ViewData["Title"] = "Danh sách phòng";
-    var vi = new System.Globalization.CultureInfo("vi-VN");
-    bool laAdmin = ViewBag.LaAdmin == true;
+    bool laAdmin = Context.Session.LaAdmin();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -106,7 +105,7 @@
                     <td>@p.SoPhong</td>
                     <td>@(p.LoaiPhong?.TenLoaiPhong ?? "(chưa có)")</td>
                     <td>@p.Tang</td>
-                    <td class="text-end">@p.DonGiaDem.ToString("N0", vi) đ</td>
+                    <td class="text-end">@p.DonGiaDem.ToTien()</td>
                     <td><partial name="_TrangThaiPhongBadge" model="p.TrangThai" /></td>
                     <td>
                         <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@p.MaPhong">Chi tiết</a>

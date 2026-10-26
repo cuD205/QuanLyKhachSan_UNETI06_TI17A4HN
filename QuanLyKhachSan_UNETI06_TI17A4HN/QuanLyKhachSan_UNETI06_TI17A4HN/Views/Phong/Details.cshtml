@@ -1,10 +1,9 @@
-﻿@* Họ và tên: [Họ tên đầy đủ] *@
+﻿@* Họ và tên: [ Dien] *@
 @* Mã sinh viên: [MSSV] *@
 @* Nội dung thực hiện: Chi tiết phòng *@
 @model Phong
 @{
     ViewData["Title"] = "Chi tiết phòng";
-    var vi = new System.Globalization.CultureInfo("vi-VN");
 }
 
 <h2>Phòng @Model.SoPhong</h2>
@@ -21,7 +20,7 @@
             <dt class="col-sm-3">Tầng</dt>
             <dd class="col-sm-9">@Model.Tang</dd>
             <dt class="col-sm-3">Đơn giá/đêm</dt>
-            <dd class="col-sm-9">@Model.DonGiaDem.ToString("N0", vi) đ</dd>
+            <dd class="col-sm-9">@Model.DonGiaDem.ToString("N0") đ</dd>
             <dt class="col-sm-3">Trạng thái</dt>
             <dd class="col-sm-9"><partial name="_TrangThaiPhongBadge" model="Model.TrangThai" /></dd>
             <dt class="col-sm-3">Số lượt đã đặt</dt>
@@ -32,5 +31,9 @@
     </div>
 </div>
 <div class="mt-3">
+    @if (Context.Session.LaAdmin())
+    {
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaPhong">Sửa</a>
+    }
     <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
 </div>

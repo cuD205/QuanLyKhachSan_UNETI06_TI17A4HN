@@ -1,5 +1,5 @@
-﻿// Họ và tên: [Đoàn Diện]
-// Mã sinh viên: [MSSV]
+﻿// Họ và tên: Đoàn Xuân Diện
+// Mã sinh viên: 23103100254
 // Nội dung thực hiện: Model cho trang danh sách phòng (điều kiện tìm kiếm, lọc, sắp xếp, phân trang)
 using Microsoft.AspNetCore.Mvc.Rendering;
 
