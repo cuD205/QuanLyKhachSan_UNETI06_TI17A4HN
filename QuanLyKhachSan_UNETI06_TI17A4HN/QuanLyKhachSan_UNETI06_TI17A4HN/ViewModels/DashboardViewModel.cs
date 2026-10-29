@@ -1,6 +1,6 @@
-// Sinh viên: Dương Minh Đức - MSSV: 23103100282
-// Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê
-// Nội dung: ViewModel chứa 8 chỉ số của trang Dashboard
+﻿// Họ và tên: Dương Minh Đức
+// Mã sinh viên: 23103100282
+// Nội dung thực hiện: ViewModel chứa 8 chỉ số của trang Dashboard
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels
 {
     public class DashboardViewModel

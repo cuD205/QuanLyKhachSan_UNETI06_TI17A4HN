@@ -1,6 +1,6 @@
-// Sinh viên: Dương Minh Đức - MSSV: 23103100282
-// Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê
-// Nội dung: Quản lý phiếu đặt phòng - danh sách, tìm/lọc, chi tiết, xác nhận, hủy, nhận phòng, trả phòng, kiểm tra trùng lịch (chỉ Admin)
+﻿// Họ và tên: Dương Minh Đức
+// Mã sinh viên: 23103100282
+// Nội dung thực hiện: Quản lý phiếu đặt phòng - danh sách, tìm/lọc, chi tiết, xác nhận, hủy, nhận phòng, trả phòng, kiểm tra trùng lịch (chỉ Admin)
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
@@ -107,6 +107,10 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             if (phieu.TrangThai != TrangThaiPhieu.ChoXacNhan)
                 return TuChoi(id, "Chỉ xác nhận được phiếu đang ở trạng thái Chờ xác nhận.");
+
+            // Ngày trả phải sau ngày nhận (phiếu sai ngày không được xác nhận)
+            if (phieu.NgayTraDuKien.Date <= phieu.NgayNhanDuKien.Date)
+                return TuChoi(id, "Ngày trả phải sau ngày nhận nên không thể xác nhận phiếu này.");
 
             // Không xác nhận phòng đã ngừng phục vụ
             foreach (var ct in phieu.ChiTietDatPhongs)

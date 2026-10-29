@@ -1,6 +1,6 @@
-@* Sinh viên: Dương Minh Đức - MSSV: 23103100282 *@
-@* Module: Module 4 - Quản lý phiếu đặt phòng, nhận/trả phòng, Dashboard, thống kê *@
-@* Nội dung: Trang Dashboard hiển thị 8 chỉ số tổng quan *@
+﻿@* Họ và tên: Dương Minh Đức *@
+@* Mã sinh viên: 23103100282 *@
+@* Nội dung thực hiện: Trang Dashboard hiển thị 8 chỉ số tổng quan và nút sang trang thống kê *@
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
@@ -29,7 +29,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Dashboard</h1>
-    <span class="text-muted small">Số liệu tại thời điểm tải trang</span>
+    <a asp-action="Index" class="btn btn-accent">Xem thống kê chi tiết →</a>
 </div>
 
 <h2 class="h5 mb-2">Phòng và khách hàng</h2>
