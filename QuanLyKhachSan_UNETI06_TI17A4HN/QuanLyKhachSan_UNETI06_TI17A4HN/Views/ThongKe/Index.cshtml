@@ -1,0 +1,233 @@
+﻿@* Họ và tên: Dương Minh Đức *@
+@* Mã sinh viên: 23103100282 *@
+@* Nội dung thực hiện: Trang thống kê 6 mục (số phòng theo loại, phiếu theo trạng thái, lượt đặt theo phòng, loại phòng nhiều lượt đặt nhất, lượt đặt theo khách, doanh thu theo tháng) *@
+@model ThongKeViewModel
+@{
+    ViewData["Title"] = "Thống kê";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Thống kê</h1>
+    <a asp-action="Dashboard" class="btn btn-outline-secondary">← Về Dashboard</a>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">1. Số phòng theo từng loại</div>
+            <div class="table-responsive">
+                @{ int max_SoPhongTheoLoai = Model.SoPhongTheoLoai.Count == 0 ? 1 : Math.Max(1, Model.SoPhongTheoLoai.Max(x => x.SoLuong)); }
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Loại phòng</th>
+                            <th class="text-center" style="width:90px;">Số phòng</th>
+                            <th style="width:35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.SoPhongTheoLoai)
+                        {
+                            <tr>
+                                <td>@i.Nhan</td>
+                                <td class="text-center fw-semibold">@i.SoLuong</td>
+                                <td>
+                                    <div style="background:#0F3D3E; height:10px; border-radius:5px; width:@(i.SoLuong * 100 / max_SoPhongTheoLoai)%;"></div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.SoPhongTheoLoai.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">2. Số phiếu theo từng trạng thái</div>
+            <div class="table-responsive">
+                @{ int max_SoPhieuTheoTrangThai = Model.SoPhieuTheoTrangThai.Count == 0 ? 1 : Math.Max(1, Model.SoPhieuTheoTrangThai.Max(x => x.SoLuong)); }
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Trạng thái</th>
+                            <th class="text-center" style="width:90px;">Số phiếu</th>
+                            <th style="width:35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.SoPhieuTheoTrangThai)
+                        {
+                            <tr>
+                                <td>@i.Nhan</td>
+                                <td class="text-center fw-semibold">@i.SoLuong</td>
+                                <td>
+                                    <div style="background:#0F3D3E; height:10px; border-radius:5px; width:@(i.SoLuong * 100 / max_SoPhieuTheoTrangThai)%;"></div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.SoPhieuTheoTrangThai.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">3. Số lượt đặt theo từng phòng</div>
+            <div class="table-responsive">
+                @{ int max_SoLuotTheoPhong = Model.SoLuotTheoPhong.Count == 0 ? 1 : Math.Max(1, Model.SoLuotTheoPhong.Max(x => x.SoLuong)); }
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Phòng</th>
+                            <th class="text-center" style="width:90px;">Lượt đặt</th>
+                            <th style="width:35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.SoLuotTheoPhong)
+                        {
+                            <tr>
+                                <td>@i.Nhan</td>
+                                <td class="text-center fw-semibold">@i.SoLuong</td>
+                                <td>
+                                    <div style="background:#0F3D3E; height:10px; border-radius:5px; width:@(i.SoLuong * 100 / max_SoLuotTheoPhong)%;"></div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.SoLuotTheoPhong.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted small mt-2 mb-0">Không tính phiếu đã hủy.</p>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">4. Loại phòng có số lượt đặt nhiều nhất</div>
+            <div class="card-body">
+                @if (Model.LoaiPhongNhieuNhat.Any())
+                {
+                    <div class="text-muted small">Đứng đầu</div>
+                    <div class="h4 fw-bold mb-0" style="color:#0F3D3E;">
+                        @(string.Join(", ", Model.LoaiPhongNhieuNhat.Select(x => x.Nhan)))
+                    </div>
+                    <div class="text-muted">@Model.LoaiPhongNhieuNhat.First().SoLuong lượt đặt</div>
+                }
+                else
+                {
+                    <div class="text-muted">Chưa có lượt đặt nào.</div>
+                }
+            </div>
+            <div class="table-responsive">
+                @{ int max_loai = Model.SoLuotTheoLoaiPhong.Count == 0 ? 1 : Math.Max(1, Model.SoLuotTheoLoaiPhong.Max(x => x.SoLuong)); }
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Loại phòng</th>
+                            <th class="text-center" style="width:90px;">Lượt đặt</th>
+                            <th style="width:35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.SoLuotTheoLoaiPhong)
+                        {
+                            <tr>
+                                <td>@i.Nhan</td>
+                                <td class="text-center fw-semibold">@i.SoLuong</td>
+                                <td>
+                                    <div style="background:#C9A227; height:10px; border-radius:5px; width:@(i.SoLuong * 100 / max_loai)%;"></div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted small m-2">Không tính phiếu đã hủy.</p>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100">
+            <div class="card-header">5. Số lượt đặt theo từng khách hàng</div>
+            <div class="table-responsive">
+                @{ int max_SoLuotTheoKhachHang = Model.SoLuotTheoKhachHang.Count == 0 ? 1 : Math.Max(1, Model.SoLuotTheoKhachHang.Max(x => x.SoLuong)); }
+                <table class="table table-bordered align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Khách hàng</th>
+                            <th class="text-center" style="width:90px;">Lượt đặt</th>
+                            <th style="width:35%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.SoLuotTheoKhachHang)
+                        {
+                            <tr>
+                                <td>@i.Nhan</td>
+                                <td class="text-center fw-semibold">@i.SoLuong</td>
+                                <td>
+                                    <div style="background:#0F3D3E; height:10px; border-radius:5px; width:@(i.SoLuong * 100 / max_SoLuotTheoKhachHang)%;"></div>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.SoLuotTheoKhachHang.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted small mt-2 mb-0">Không tính phiếu đã hủy.</p>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">6. Doanh thu theo tháng (phiếu đã trả phòng)</div>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Tháng</th>
+                    <th class="text-center">Số phiếu</th>
+                    <th class="text-end">Doanh thu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model.DoanhThuTheoThang)
+                {
+                    <tr>
+                        <td>@(t.Thang.ToString("00"))/@t.Nam</td>
+                        <td class="text-center">@t.SoPhieu</td>
+                        <td class="text-end">@t.DoanhThu.ToTien()</td>
+                    </tr>
+                }
+                @if (!Model.DoanhThuTheoThang.Any())
+                {
+                    <tr><td colspan="3" class="text-center text-muted py-3">Chưa có phiếu nào đã trả phòng.</td></tr>
+                }
+            </tbody>
+            @if (Model.DoanhThuTheoThang.Any())
+            {
+                <tfoot>
+                    <tr>
+                        <th>Tổng cộng</th>
+                        <th class="text-center">@Model.DoanhThuTheoThang.Sum(d => d.SoPhieu)</th>
+                        <th class="text-end">@Model.DoanhThuTheoThang.Sum(d => d.DoanhThu).ToTien()</th>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+    <p class="text-muted small m-2">Hệ thống chưa lưu ngày trả thực tế, nên mỗi phiếu được tính vào tháng của ngày trả dự kiến.</p>
+</div>
