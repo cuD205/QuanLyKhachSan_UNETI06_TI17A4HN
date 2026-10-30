@@ -1,0 +1,67 @@
+﻿@* Họ và tên: Dương Minh Đức *@
+@* Mã sinh viên: 23103100282 *@
+@* Nội dung thực hiện: Trang Dashboard hiển thị 8 chỉ số tổng quan và nút sang trang thống kê *@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+
+    // Mỗi ô: nhãn, số liệu, đường dẫn tới danh sách liên quan (null nếu không có)
+    var hangDanhMuc = new (string Nhan, int So, string? Link)[]
+    {
+        ("Tổng số loại phòng", Model.TongLoaiPhong, null),
+        ("Tổng số phòng", Model.TongPhong, null),
+        ("Tổng số khách hàng", Model.TongKhachHang, null),
+        ("Số phòng đang sử dụng", Model.PhongDangSuDung, null)
+    };
+
+    var hangPhieu = new (string Nhan, int So, string? Link)[]
+    {
+        ("Tổng số phiếu đặt phòng", Model.TongPhieuDatPhong,
+            Url.Action("Index", "PhieuDatPhong")),
+        ("Phiếu chờ xác nhận", Model.PhieuChoXacNhan,
+            Url.Action("Index", "PhieuDatPhong", new { trangThai = TrangThaiPhieu.ChoXacNhan })),
+        ("Phiếu đã xác nhận", Model.PhieuDaXacNhan,
+            Url.Action("Index", "PhieuDatPhong", new { trangThai = TrangThaiPhieu.DaXacNhan })),
+        ("Phiếu đã trả phòng", Model.PhieuDaTraPhong,
+            Url.Action("Index", "PhieuDatPhong", new { trangThai = TrangThaiPhieu.DaTraPhong }))
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <a asp-action="Index" class="btn btn-accent">Xem thống kê chi tiết →</a>
+</div>
+
+<h2 class="h5 mb-2">Phòng và khách hàng</h2>
+<div class="row g-3 mb-4">
+    @foreach (var o in hangDanhMuc)
+    {
+        <div class="col-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">@o.Nhan</div>
+                    <div class="display-6 fw-bold" style="color:#0F3D3E;">@o.So</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<h2 class="h5 mb-2">Phiếu đặt phòng</h2>
+<div class="row g-3">
+    @foreach (var o in hangPhieu)
+    {
+        <div class="col-6 col-lg-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="text-muted small">@o.Nhan</div>
+                    <div class="display-6 fw-bold" style="color:#0F3D3E;">@o.So</div>
+                    @if (o.Link != null)
+                    {
+                        <a href="@o.Link" class="small">Xem danh sách →</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

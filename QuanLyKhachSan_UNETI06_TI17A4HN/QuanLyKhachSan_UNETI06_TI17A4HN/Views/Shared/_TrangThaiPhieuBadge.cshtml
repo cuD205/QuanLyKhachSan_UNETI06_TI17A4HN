@@ -1,0 +1,16 @@
+﻿@* Họ và tên: Dương Minh Đức *@
+@* Mã sinh viên: 23103100282 *@
+@* Nội dung thực hiện: Partial hiển thị nhãn trạng thái phiếu đặt (dùng: <partial name="_TrangThaiPhieuBadge" model="item.TrangThai" />) *@
+@model string
+@{
+    var (css, nhan) = Model switch
+    {
+        TrangThaiPhieu.ChoXacNhan  => ("badge-choxacnhan", "Chờ xác nhận"),
+        TrangThaiPhieu.DaXacNhan   => ("badge-daxacnhan", "Đã xác nhận"),
+        TrangThaiPhieu.DaNhanPhong => ("badge-danhanphong", "Đã nhận phòng"),
+        TrangThaiPhieu.DaTraPhong  => ("badge-datraphong", "Đã trả phòng"),
+        TrangThaiPhieu.DaHuy       => ("badge-dahuy", "Đã hủy"),
+        _                          => ("badge-tamngung", Model)
+    };
+}
+<span class="badge badge-trangthai @css">@nhan</span>
