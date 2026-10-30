@@ -66,8 +66,6 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
         {
             return hoatDong ? NhanXanhLa : NhanDo;
         }
-
-        // HÀM CŨ: chỉ giữ tạm để View chưa thay vẫn build được. Xóa ở bước cuối.
         public static string MauTrangThaiPhieu(string trangThai)
         {
             return trangThai switch
