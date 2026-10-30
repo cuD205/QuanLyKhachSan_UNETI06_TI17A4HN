@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers;
 using QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels;
+using QuanLyKhachSan_UNETI06_TI17A4HN.Models;
 
 namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 {
@@ -71,6 +72,86 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 return LocalRedirect(model.ReturnUrl);
             }
             return RedirectToAction("Index", "Home");
+        }
+
+
+        [HttpGet]
+        public IActionResult DangKy()
+        {
+            if (HttpContext.Session.DaDangNhap())
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View(new DangKyViewModel());
+        }
+
+        // Đăng ký: tạo TaiKhoan (vai trò KhachHang) và KhachHang tương ứng (quan hệ 1 - 1) trong cùng một lần lưu
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DangKy(DangKyViewModel model)
+        {
+            model.TenDangNhap = model.TenDangNhap?.Trim() ?? string.Empty;
+            model.HoTen = model.HoTen?.Trim() ?? string.Empty;
+            model.CCCD = model.CCCD?.Trim() ?? string.Empty;
+
+            if (model.NgaySinh.HasValue && (model.NgaySinh.Value.Date > DateTime.Today || model.NgaySinh.Value.Year < 1900))
+            {
+                ModelState.AddModelError(nameof(model.NgaySinh), "Ngày sinh không hợp lệ.");
+            }
+
+            // Các quy tắc không có sẵn trong Data Annotation: tên đăng nhập và CCCD không được trùng
+            if (!string.IsNullOrEmpty(model.TenDangNhap) &&
+                await _context.TaiKhoans.AnyAsync(t => t.TenDangNhap == model.TenDangNhap))
+            {
+                ModelState.AddModelError(nameof(model.TenDangNhap), "Tên đăng nhập đã tồn tại.");
+            }
+
+            if (!string.IsNullOrEmpty(model.CCCD) &&
+                await _context.KhachHangs.AnyAsync(k => k.CCCD == model.CCCD))
+            {
+                ModelState.AddModelError(nameof(model.CCCD), "CCCD này đã được đăng ký.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var taiKhoan = new TaiKhoan
+            {
+                TenDangNhap = model.TenDangNhap,
+                MatKhau = model.MatKhau,
+                HoTen = model.HoTen,
+                Email = model.Email,
+                VaiTro = VaiTro.KhachHang,   // tự đăng ký chỉ được làm khách hàng, không thể tự chọn Admin
+                TrangThai = true,
+                KhachHang = new KhachHang
+                {
+                    HoTen = model.HoTen,
+                    NgaySinh = model.NgaySinh!.Value,
+                    GioiTinh = model.GioiTinh,
+                    SoDienThoai = model.SoDienThoai,
+                    Email = model.Email,
+                    CCCD = model.CCCD,
+                    DiaChi = model.DiaChi,
+                    NgayDangKy = DateTime.Now,
+                    TrangThai = true
+                }
+            };
+
+            try
+            {
+                _context.TaiKhoans.Add(taiKhoan);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                ModelState.AddModelError(string.Empty, "Không thể đăng ký: tên đăng nhập hoặc CCCD đã tồn tại.");
+                return View(model);
+            }
+
+            TempData["ThanhCong"] = "Đăng ký thành công. Mời bạn đăng nhập.";
+            return RedirectToAction(nameof(DangNhap));
         }
 
         // Đăng xuất: xóa thông tin đăng nhập khỏi Session rồi về trang chủ
