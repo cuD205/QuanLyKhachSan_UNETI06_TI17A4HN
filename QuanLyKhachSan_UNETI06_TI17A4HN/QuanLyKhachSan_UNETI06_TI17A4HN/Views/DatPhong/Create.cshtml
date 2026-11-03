@@ -1,0 +1,119 @@
+﻿@* Họ và tên: Đinh Ngọc Cường *@
+@* Mã sinh viên: 23103100260 *@
+@* Nội dung thực hiện: Giao diện form đặt phòng của khách hàng *@
+@model QuanLyKhachSan_UNETI06_TI17A4HN.ViewModels.DatPhongViewModel
+@using QuanLyKhachSan_UNETI06_TI17A4HN.Helpers
+@{
+    ViewData["Title"] = "Đặt phòng";
+    var phong = ViewData["Phong"] as QuanLyKhachSan_UNETI06_TI17A4HN.Models.Phong;
+    string homNay = DateTime.Today.ToString("yyyy-MM-dd");
+}
+
+<h1 class="mb-1">Đặt phòng</h1>
+<p class="text-muted mb-4">Chọn ngày nhận, ngày trả và số người để gửi yêu cầu đặt phòng.</p>
+
+<partial name="_ThongBao" />
+
+@if (phong != null)
+{
+    <div class="row g-4">
+        <div class="col-md-5">
+            <div class="card" id="thongTinPhong" data-gia="@((long)phong.DonGiaDem)">
+                <div class="card-header">Phòng @phong.SoPhong</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5">Loại phòng</dt>
+                        <dd class="col-sm-7">@phong.LoaiPhong?.TenLoaiPhong</dd>
+
+                        <dt class="col-sm-5">Tầng</dt>
+                        <dd class="col-sm-7">@phong.Tang</dd>
+
+                        <dt class="col-sm-5">Sức chứa</dt>
+                        <dd class="col-sm-7">Tối đa @phong.LoaiPhong?.SoNguoiToiDa người</dd>
+
+                        <dt class="col-sm-5">Đơn giá mỗi đêm</dt>
+                        <dd class="col-sm-7 fw-semibold">@DinhDang.Tien(phong.DonGiaDem)</dd>
+
+                        @if (!string.IsNullOrWhiteSpace(phong.MoTa))
+                        {
+                            <dt class="col-sm-5">Mô tả</dt>
+                            <dd class="col-sm-7">@phong.MoTa</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">Thông tin đặt phòng</div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="MaPhong" />
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="NgayNhanDuKien" class="form-label"></label>
+                                <input asp-for="NgayNhanDuKien" type="date" class="form-control" min="@homNay" />
+                                <span asp-validation-for="NgayNhanDuKien" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="NgayTraDuKien" class="form-label"></label>
+                                <input asp-for="NgayTraDuKien" type="date" class="form-control" min="@homNay" />
+                                <span asp-validation-for="NgayTraDuKien" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-12">
+                                <label asp-for="SoNguoi" class="form-label"></label>
+                                <input asp-for="SoNguoi" type="number" min="1" class="form-control" />
+                                <span asp-validation-for="SoNguoi" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-secondary mt-4 mb-3">
+                            <div id="xemTruoc">Chọn ngày nhận và ngày trả để xem tạm tính.</div>
+                            <small class="text-muted">Giá trị thật do hệ thống tính khi đặt phòng.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Xác nhận đặt phòng</button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Hủy</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Chỉ để XEM TRƯỚC cho tiện. Số đêm và tổng tiền thật do server tính.
+        (function () {
+            var card = document.getElementById('thongTinPhong');
+            if (!card) return;
+            var gia = parseInt(card.dataset.gia, 10);
+            var nhan = document.getElementById('NgayNhanDuKien');
+            var tra = document.getElementById('NgayTraDuKien');
+            var kq = document.getElementById('xemTruoc');
+
+            function capNhat() {
+                if (!nhan.value || !tra.value) {
+                    kq.textContent = 'Chọn ngày nhận và ngày trả để xem tạm tính.';
+                    return;
+                }
+                var soDem = Math.round((new Date(tra.value) - new Date(nhan.value)) / 86400000);
+                if (isNaN(soDem) || soDem <= 0) {
+                    kq.textContent = 'Ngày trả phải sau ngày nhận.';
+                    return;
+                }
+                var tong = soDem * gia;
+                kq.textContent = 'Tạm tính: ' + soDem + ' đêm x ' + gia.toLocaleString('vi-VN') +
+                                 ' ₫ = ' + tong.toLocaleString('vi-VN') + ' ₫';
+            }
+
+            nhan.addEventListener('change', capNhat);
+            tra.addEventListener('change', capNhat);
+            capNhat();
+        })();
+    </script>
+}
