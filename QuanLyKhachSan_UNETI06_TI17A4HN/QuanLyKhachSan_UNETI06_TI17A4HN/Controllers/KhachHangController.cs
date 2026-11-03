@@ -76,7 +76,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             khachHang.TrangThai = !khachHang.TrangThai;
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = khachHang.TrangThai
+            TempData["ThanhCong"] = khachHang.TrangThai
                 ? $"Đã mở khóa khách hàng {khachHang.HoTen}."
                 : $"Đã khóa khách hàng {khachHang.HoTen}.";
 
@@ -185,7 +185,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Đã cập nhật thông tin cá nhân.";
+            TempData["ThanhCong"] = "Đã cập nhật thông tin cá nhân.";
             return RedirectToAction(nameof(ThongTinCaNhan));
         }
 

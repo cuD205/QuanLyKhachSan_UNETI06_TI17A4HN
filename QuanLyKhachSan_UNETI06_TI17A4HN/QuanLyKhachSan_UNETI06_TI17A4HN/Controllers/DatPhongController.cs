@@ -30,7 +30,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             var khachHang = await LayKhachHangDangNhapAsync();
             if (khachHang == null)
             {
-                TempData["Error"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước khi đặt phòng.";
+                TempData["Loi"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước khi đặt phòng.";
                 return RedirectToAction("ThongTinCaNhan", "KhachHang");
             }
 
@@ -42,7 +42,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             if (phong.TrangThai == TrangThaiPhong.TamNgung)
             {
-                TempData["Error"] = "Phòng này đang tạm ngừng phục vụ, không thể đặt.";
+                TempData["Loi"] = "Phòng này đang tạm ngừng phục vụ, không thể đặt.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -59,7 +59,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             var khachHang = await LayKhachHangDangNhapAsync();
             if (khachHang == null)
             {
-                TempData["Error"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước khi đặt phòng.";
+                TempData["Loi"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước khi đặt phòng.";
                 return RedirectToAction("ThongTinCaNhan", "KhachHang");
             }
             if (!khachHang.TrangThai)
@@ -155,7 +155,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            TempData["Success"] = "Đặt phòng thành công! Phiếu của bạn đang chờ khách sạn xác nhận.";
+            TempData["ThanhCong"] = "Đặt phòng thành công! Phiếu của bạn đang chờ khách sạn xác nhận.";
             return RedirectToAction(nameof(Details), new { id = phieu.MaPhieuDat });
         }
 
@@ -233,7 +233,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
         // Khách chưa có hồ sơ thì đưa tới trang tạo hồ sơ
         private IActionResult ChuyenDenHoSo()
         {
-            TempData["Error"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước.";
+            TempData["Loi"] = "Bạn cần hoàn thiện hồ sơ khách hàng trước.";
             return RedirectToAction("ThongTinCaNhan", "KhachHang");
         }
 
