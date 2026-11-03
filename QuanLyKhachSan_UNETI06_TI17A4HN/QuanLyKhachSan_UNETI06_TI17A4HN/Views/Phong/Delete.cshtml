@@ -1,5 +1,5 @@
-﻿@* Họ và tên: [Đoàn Xuân Diện] *@
-@* Mã sinh viên: [23103100254] *@
+﻿@* Họ và tên: Đoàn Xuân Diện *@
+@* Mã sinh viên: 23103100254 *@
 @* Nội dung thực hiện: Xóa phòng, chặn xóa phòng đã có phiếu đặt *@
 @model Phong
 @{
@@ -9,10 +9,7 @@
 
 <h2>Xóa phòng @Model.SoPhong</h2>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
+
 
 <div class="card">
     <div class="card-header">Xác nhận xóa</div>
