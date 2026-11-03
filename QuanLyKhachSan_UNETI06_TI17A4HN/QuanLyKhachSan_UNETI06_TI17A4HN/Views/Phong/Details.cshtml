@@ -1,5 +1,5 @@
-﻿@* Họ và tên: [ Dien] *@
-@* Mã sinh viên: [MSSV] *@
+﻿@* Họ và tên: Đoàn Xuân Diện *@
+@* Mã sinh viên: 23103100254 *@
 @* Nội dung thực hiện: Chi tiết phòng *@
 @model Phong
 @{
@@ -34,6 +34,10 @@
     @if (Context.Session.LaAdmin())
     {
         <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.MaPhong">Sửa</a>
+    }
+    @if (Context.Session.LaKhachHang() && Model.TrangThai != TrangThaiPhong.TamNgung)
+    {
+        <a class="btn btn-accent" asp-controller="DatPhong" asp-action="Create" asp-route-maPhong="@Model.MaPhong">Đặt phòng</a>
     }
     <a class="btn btn-outline-secondary" asp-action="Index">Quay lại danh sách</a>
 </div>

@@ -151,7 +151,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 {
                     _context.Phongs.Add(phong);
                     await _context.SaveChangesAsync();
-                    TempData["Success"] = $"Đã thêm phòng {phong.SoPhong}.";
+                    TempData["ThanhCong"] = $"Đã thêm phòng {phong.SoPhong}.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException)
@@ -175,22 +175,22 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
             if (trangThai != TrangThaiPhong.SanSang && trangThai != TrangThaiPhong.TamNgung)
             {
-                TempData["Error"] = "Trạng thái không hợp lệ.";
+                TempData["Loi"] = "Trạng thái không hợp lệ.";
             }
             else if (phong.TrangThai == TrangThaiPhong.DangSuDung)
             {
                 // Trạng thái này do Module 4 cập nhật khi nhận/trả phòng
-                TempData["Error"] = $"Phòng {phong.SoPhong} đang có khách, không thể đổi trạng thái. Trạng thái sẽ tự cập nhật khi trả phòng.";
+                TempData["Loi"] = $"Phòng {phong.SoPhong} đang có khách, không thể đổi trạng thái. Trạng thái sẽ tự cập nhật khi trả phòng.";
             }
             else if (phong.TrangThai == trangThai)
             {
-                TempData["Error"] = $"Phòng {phong.SoPhong} đã ở trạng thái này rồi.";
+                TempData["Loi"] = $"Phòng {phong.SoPhong} đã ở trạng thái này rồi.";
             }
             else
             {
                 phong.TrangThai = trangThai;
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Đã chuyển phòng {phong.SoPhong} sang trạng thái \"{DanhSachTrangThai()[trangThai]}\".";
+                TempData["ThanhCong"] = $"Đã chuyển phòng {phong.SoPhong} sang trạng thái \"{DanhSachTrangThai()[trangThai]}\".";
             }
 
             // Quay lại đúng trang đang xem, giữ nguyên điều kiện tìm/lọc/sắp xếp/phân trang
@@ -241,7 +241,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 try
                 {
                     await _context.SaveChangesAsync();
-                    TempData["Success"] = $"Đã cập nhật phòng {hienTai.SoPhong}.";
+                    TempData["ThanhCong"] = $"Đã cập nhật phòng {hienTai.SoPhong}.";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException)
@@ -280,7 +280,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             // Chặn xóa nếu phòng đã có trong phiếu đặt
             if (await _context.ChiTietDatPhongs.AnyAsync(c => c.MaPhong == id))
             {
-                TempData["Error"] = $"Không thể xóa phòng {phong.SoPhong} vì đã có trong phiếu đặt phòng.";
+                TempData["Loi"] = $"Không thể xóa phòng {phong.SoPhong} vì đã có trong phiếu đặt phòng.";
                 return RedirectToAction(nameof(Delete), new { id });
             }
 
@@ -288,11 +288,11 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             {
                 _context.Phongs.Remove(phong);
                 await _context.SaveChangesAsync();
-                TempData["Success"] = $"Đã xóa phòng {phong.SoPhong}.";
+                TempData["ThanhCong"] = $"Đã xóa phòng {phong.SoPhong}.";
             }
             catch (DbUpdateException)
             {
-                TempData["Error"] = $"Không thể xóa phòng {phong.SoPhong}.";
+                TempData["Loi"] = $"Không thể xóa phòng {phong.SoPhong}.";
                 return RedirectToAction(nameof(Delete), new { id });
             }
 
