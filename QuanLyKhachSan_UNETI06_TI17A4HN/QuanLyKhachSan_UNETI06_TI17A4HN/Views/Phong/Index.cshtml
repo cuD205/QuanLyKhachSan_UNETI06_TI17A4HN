@@ -1,0 +1,149 @@
+﻿@* Họ và tên: Đoàn Xuân Diện *@
+@* Mã sinh viên: 23103100254 *@
+@* Nội dung thực hiện: Quản lý phòng, cập nhật trạng thái, tìm kiếm, lọc, sắp xếp và phân trang *@
+@model PhongIndexViewModel
+@{
+    ViewData["Title"] = "Danh sách phòng";
+    bool laAdmin = Context.Session.LaAdmin();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Danh sách phòng</h2>
+    @if (laAdmin)
+    {
+        <a class="btn btn-primary" asp-action="Create">Thêm phòng</a>
+    }
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card mb-3">
+    <div class="card-header">Tìm kiếm và lọc</div>
+    <div class="card-body">
+        <form method="get" asp-action="Index">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label" for="search">Số phòng hoặc tên loại phòng</label>
+                    <input type="text" class="form-control" id="search" name="search" value="@Model.Search" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="maLoaiPhong">Loại phòng</label>
+                    <select class="form-select" id="maLoaiPhong" name="maLoaiPhong" asp-items="Model.LoaiPhongOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="tang">Tầng</label>
+                    <select class="form-select" id="tang" name="tang" asp-items="Model.TangOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label" for="trangThai">Trạng thái</label>
+                    <select class="form-select" id="trangThai" name="trangThai" asp-items="Model.TrangThaiOptions">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="giaTu">Đơn giá từ (đ)</label>
+                    <input type="number" min="0" step="1000" class="form-control" id="giaTu" name="giaTu"
+                           value="@(Model.GiaTu?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="giaDen">Đơn giá đến (đ)</label>
+                    <input type="number" min="0" step="1000" class="form-control" id="giaDen" name="giaDen"
+                           value="@(Model.GiaDen?.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture))" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="sapXep">Sắp xếp</label>
+                    <select class="form-select" id="sapXep" name="sapXep" asp-items="Model.SapXepOptions"></select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="pageSize">Hiển thị</label>
+                    <select class="form-select" id="pageSize" name="pageSize" asp-items="Model.PageSizeOptions"></select>
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Tìm và lọc</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Xóa bộ lọc</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<p class="text-muted">
+    Tìm thấy <strong>@Model.TotalItems</strong> phòng. Trang @Model.Page / @Model.TotalPages.
+</p>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Số phòng</th>
+                <th>Loại phòng</th>
+                <th>Tầng</th>
+                <th class="text-end">Đơn giá/đêm</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+                @if (laAdmin)
+                {
+                    <th>Đổi trạng thái</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model.Phongs)
+            {
+                <tr>
+                    <td>@p.SoPhong</td>
+                    <td>@(p.LoaiPhong?.TenLoaiPhong ?? "(chưa có)")</td>
+                    <td>@p.Tang</td>
+                    <td class="text-end">@p.DonGiaDem.ToTien()</td>
+                    <td><partial name="_TrangThaiPhongBadge" model="p.TrangThai" /></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Details" asp-route-id="@p.MaPhong">Chi tiết</a>
+                        @if (laAdmin)
+                        {
+                            <a class="btn btn-sm btn-primary" asp-action="Edit" asp-route-id="@p.MaPhong">Sửa</a>
+                            <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@p.MaPhong">Xóa</a>
+                        }
+                    </td>
+                    @if (laAdmin)
+                    {
+                        <td>
+                            @if (p.TrangThai == TrangThaiPhong.DangSuDung)
+                            {
+                                <span class="text-muted">Đang có khách</span>
+                            }
+                            else
+                            {
+                                <form asp-action="CapNhatTrangThai" method="post" class="d-flex gap-1">
+                                    <input type="hidden" name="id" value="@p.MaPhong" />
+                                    <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                                    <select name="trangThai" class="form-select form-select-sm">
+                                        <option value="@TrangThaiPhong.SanSang" selected="@(p.TrangThai == TrangThaiPhong.SanSang)">Sẵn sàng</option>
+                                        <option value="@TrangThaiPhong.TamNgung" selected="@(p.TrangThai == TrangThaiPhong.TamNgung)">Tạm ngừng</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
+                                </form>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+            @if (!Model.Phongs.Any())
+            {
+                <tr><td colspan="@(laAdmin ? 7 : 6)" class="text-center text-muted">Không có phòng nào phù hợp.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<partial name="_Pagination" model="Model" />

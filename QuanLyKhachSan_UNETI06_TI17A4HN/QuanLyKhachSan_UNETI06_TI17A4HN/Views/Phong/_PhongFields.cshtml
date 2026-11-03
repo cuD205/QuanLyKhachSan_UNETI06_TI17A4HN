@@ -1,0 +1,38 @@
+﻿@* Họ và tên: [Đoàn Xuân Diện] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Các ô nhập dùng chung cho thêm/sửa phòng *@
+@model Phong
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="SoPhong" class="form-label">Số phòng</label>
+        <input asp-for="SoPhong" class="form-control" />
+        <span asp-validation-for="SoPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-6">
+        <label asp-for="MaLoaiPhong" class="form-label">Loại phòng</label>
+        <select asp-for="MaLoaiPhong" class="form-select" asp-items="(SelectList)ViewBag.LoaiPhongList">
+            <option value="">-- Chọn loại phòng --</option>
+        </select>
+        <span asp-validation-for="MaLoaiPhong" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Tang" class="form-label">Tầng</label>
+        <input asp-for="Tang" class="form-control" type="number" min="1" />
+        <span asp-validation-for="Tang" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="DonGiaDem" class="form-label">Đơn giá/đêm (đ)</label>
+        <input asp-for="DonGiaDem" class="form-control" type="number" min="0" step="1000" />
+        <span asp-validation-for="DonGiaDem" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="TrangThai" class="form-label">Trạng thái</label>
+        <select asp-for="TrangThai" class="form-select" asp-items="(List<SelectListItem>)ViewBag.TrangThaiList"></select>
+        <span asp-validation-for="TrangThai" class="text-danger"></span>
+    </div>
+    <div class="col-12">
+        <label asp-for="MoTa" class="form-label">Mô tả</label>
+        <textarea asp-for="MoTa" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="MoTa" class="text-danger"></span>
+    </div>
+</div>

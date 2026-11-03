@@ -1,0 +1,46 @@
+﻿@* Họ và tên: [Đoàn Xuân Diện] *@
+@* Mã sinh viên: [23103100254] *@
+@* Nội dung thực hiện: Xóa phòng, chặn xóa phòng đã có phiếu đặt *@
+@model Phong
+@{
+    ViewData["Title"] = "Xóa phòng";
+    bool coLuotDat = ViewBag.CoLuotDat == true;
+}
+
+<h2>Xóa phòng @Model.SoPhong</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card">
+    <div class="card-header">Xác nhận xóa</div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Số phòng</dt>
+            <dd class="col-sm-9">@Model.SoPhong</dd>
+            <dt class="col-sm-3">Loại phòng</dt>
+            <dd class="col-sm-9">@(Model.LoaiPhong?.TenLoaiPhong ?? "(chưa có)")</dd>
+            <dt class="col-sm-3">Tầng</dt>
+            <dd class="col-sm-9">@Model.Tang</dd>
+        </dl>
+
+        @if (coLuotDat)
+        {
+            <div class="alert alert-warning">
+                Phòng này đã có trong phiếu đặt phòng nên không thể xóa. Bạn có thể chuyển trạng thái sang "Tạm ngừng" ở danh sách phòng.
+            </div>
+            <a class="btn btn-outline-secondary" asp-action="Index">Quay lại</a>
+        }
+        else
+        {
+            <p>Bạn có chắc muốn xóa phòng này không? Thao tác không thể hoàn tác.</p>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" name="id" value="@Model.MaPhong" />
+                <button type="submit" class="btn btn-danger">Xóa</button>
+                <a class="btn btn-outline-secondary" asp-action="Index">Hủy</a>
+            </form>
+        }
+    </div>
+</div>
