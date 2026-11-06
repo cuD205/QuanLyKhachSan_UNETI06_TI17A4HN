@@ -1,9 +1,15 @@
 ﻿@* Họ và tên: Dương Minh Đức *@
 @* Mã sinh viên: 23103100282 *@
-@* Nội dung thực hiện: Trang Dashboard hiển thị 8 chỉ số tổng quan và nút sang trang thống kê *@
+@* Nội dung thực hiện: Trang Dashboard hiển thị 8 chỉ số tổng quan, 2 biểu đồ Chart.js và nút sang trang thống kê *@
 @model DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
+
+    // Tách dữ liệu thành các danh sách nhãn / giá trị để đưa sang JavaScript của Chart.js
+    var nhanTrangThai = Model.PhieuTheoTrangThai.Select(x => x.Nhan).ToList();
+    var soPhieuTheoTrangThai = Model.PhieuTheoTrangThai.Select(x => x.SoLuong).ToList();
+    var nhanThang = Model.DoanhThuTheoThang.Select(x => x.Thang.ToString("00") + "/" + x.Nam).ToList();
+    var doanhThuThang = Model.DoanhThuTheoThang.Select(x => x.DoanhThu).ToList();
 
     // Mỗi ô: nhãn, số liệu, đường dẫn tới danh sách liên quan (null nếu không có)
     var hangDanhMuc = new (string Nhan, int So, string? Link)[]
@@ -65,3 +71,79 @@
         </div>
     }
 </div>
+
+<h2 class="h5 mt-4 mb-2">Biểu đồ</h2>
+<div class="row g-3">
+    <div class="col-12 col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">Số phiếu theo trạng thái</div>
+            <div class="card-body">
+                <canvas id="bieuDoTrangThai" height="260"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-7">
+        <div class="card h-100">
+            <div class="card-header">Doanh thu theo tháng (phiếu đã trả phòng)</div>
+            <div class="card-body">
+                @if (doanhThuThang.Count == 0)
+                {
+                    <p class="text-muted mb-0">Chưa có phiếu nào được trả phòng.</p>
+                }
+                else
+                {
+                    <canvas id="bieuDoDoanhThu" height="260"></canvas>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        // Dữ liệu do server (Razor) đổ vào dưới dạng JSON
+        const nhanTrangThai = @Json.Serialize(nhanTrangThai);
+        const soPhieu = @Json.Serialize(soPhieuTheoTrangThai);
+        const nhanThang = @Json.Serialize(nhanThang);
+        const doanhThu = @Json.Serialize(doanhThuThang);
+
+        // Biểu đồ tròn (doughnut): số phiếu theo trạng thái
+        new Chart(document.getElementById('bieuDoTrangThai'), {
+            type: 'doughnut',
+            data: {
+                labels: nhanTrangThai,
+                datasets: [{
+                    data: soPhieu,
+                    backgroundColor: ['#E0A800', '#2A7F9E', '#B8860B', '#1E7B4F', '#C0392B']
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Biểu đồ cột: doanh thu theo tháng (chỉ vẽ khi có dữ liệu)
+        const canvasDoanhThu = document.getElementById('bieuDoDoanhThu');
+        if (canvasDoanhThu) {
+            new Chart(canvasDoanhThu, {
+                type: 'bar',
+                data: {
+                    labels: nhanThang,
+                    datasets: [{
+                        label: 'Doanh thu (đ)',
+                        data: doanhThu,
+                        backgroundColor: '#0F3D3E'
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: function (v) { return v.toLocaleString('vi-VN'); } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}
