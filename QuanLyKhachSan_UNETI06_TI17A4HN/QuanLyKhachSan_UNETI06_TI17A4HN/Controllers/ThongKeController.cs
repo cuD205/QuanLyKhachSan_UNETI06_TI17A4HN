@@ -1,6 +1,6 @@
 ﻿// Họ và tên: Dương Minh Đức
 // Mã sinh viên: 23103100282
-// Nội dung thực hiện: Dashboard 8 chỉ số và trang thống kê 6 mục bằng LINQ (Count, Sum, GroupBy, OrderBy, OrderByDescending) - chỉ Admin
+// Nội dung thực hiện: Dashboard 8 chỉ số + 2 biểu đồ Chart.js và trang thống kê 6 mục bằng LINQ (Count, Sum, GroupBy, OrderBy, OrderByDescending) - chỉ Admin
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
@@ -44,6 +44,41 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 PhieuDaTraPhong = await _context.PhieuDatPhongs
                     .CountAsync(p => p.TrangThai == TrangThaiPhieu.DaTraPhong)
             };
+
+            // ---- Dữ liệu cho 2 biểu đồ ----
+            // Biểu đồ tròn: số phiếu theo từng trạng thái (đủ 5 trạng thái, trạng thái chưa có phiếu = 0)
+            var theoTrangThai = await _context.PhieuDatPhongs
+                .GroupBy(p => p.TrangThai)
+                .Select(g => new { TrangThai = g.Key, SoLuong = g.Count() })
+                .ToListAsync();
+
+            var thuTuTrangThai = new[]
+            {
+                TrangThaiPhieu.ChoXacNhan, TrangThaiPhieu.DaXacNhan, TrangThaiPhieu.DaNhanPhong,
+                TrangThaiPhieu.DaTraPhong, TrangThaiPhieu.DaHuy
+            };
+            model.PhieuTheoTrangThai = thuTuTrangThai
+                .Select(tt => new ThongKeItem
+                {
+                    Nhan = TenTrangThaiPhieu(tt),
+                    SoLuong = theoTrangThai.FirstOrDefault(x => x.TrangThai == tt)?.SoLuong ?? 0
+                })
+                .ToList();
+
+            // Biểu đồ cột: doanh thu theo tháng, chỉ tính phiếu đã trả phòng (cùng quy tắc với trang Thống kê)
+            model.DoanhThuTheoThang = await _context.PhieuDatPhongs
+                .Where(p => p.TrangThai == TrangThaiPhieu.DaTraPhong)
+                .GroupBy(p => new { p.NgayTraDuKien.Year, p.NgayTraDuKien.Month })
+                .Select(g => new ThongKeDoanhThuThang
+                {
+                    Nam = g.Key.Year,
+                    Thang = g.Key.Month,
+                    SoPhieu = g.Count(),
+                    DoanhThu = g.Sum(p => p.TongTienDuKien)
+                })
+                .OrderBy(x => x.Nam)
+                .ThenBy(x => x.Thang)
+                .ToListAsync();
 
             return View(model);
         }
