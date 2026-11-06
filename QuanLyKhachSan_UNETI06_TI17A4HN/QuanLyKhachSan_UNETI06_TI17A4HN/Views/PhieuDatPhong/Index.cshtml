@@ -1,6 +1,6 @@
 ﻿@* Họ và tên: Dương Minh Đức *@
 @* Mã sinh viên: 23103100282 *@
-@* Nội dung thực hiện: Danh sách phiếu đặt phòng (tìm theo tên khách, lọc trạng thái, lọc ngày nhận dự kiến) *@
+@* Nội dung thực hiện: Danh sách phiếu đặt phòng (tìm theo tên khách, lọc trạng thái, lọc ngày nhận dự kiến, xuất Excel) *@
 @model PhieuDatPhongIndexViewModel
 @{
     ViewData["Title"] = "Quản lý phiếu đặt phòng";
@@ -16,7 +16,15 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Quản lý phiếu đặt phòng</h1>
-    <span class="text-muted">@Model.DanhSach.Count phiếu</span>
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-muted">@Model.DanhSach.Count phiếu</span>
+        <a class="btn btn-outline-success btn-sm"
+           asp-action="XuatExcel"
+           asp-route-tuKhoa="@Model.TuKhoa"
+           asp-route-trangThai="@Model.TrangThai"
+           asp-route-tuNgay="@Model.TuNgay?.ToString("yyyy-MM-dd")"
+           asp-route-denNgay="@Model.DenNgay?.ToString("yyyy-MM-dd")">Xuất Excel</a>
+    </div>
 </div>
 
 <div class="card mb-3">
