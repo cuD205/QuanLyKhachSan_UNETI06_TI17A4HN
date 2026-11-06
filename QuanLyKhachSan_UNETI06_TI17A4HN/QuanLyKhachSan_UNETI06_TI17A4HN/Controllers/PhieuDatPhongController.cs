@@ -1,6 +1,7 @@
 ﻿// Họ và tên: Dương Minh Đức
 // Mã sinh viên: 23103100282
-// Nội dung thực hiện: Quản lý phiếu đặt phòng - danh sách, tìm/lọc, chi tiết, xác nhận, hủy, nhận phòng, trả phòng, kiểm tra trùng lịch (chỉ Admin)
+// Nội dung thực hiện: Quản lý phiếu đặt phòng - danh sách, tìm/lọc, chi tiết, xác nhận, hủy, nhận phòng, trả phòng, kiểm tra trùng lịch, xuất Excel (chỉ Admin)
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyKhachSan_UNETI06_TI17A4HN.Data;
@@ -25,6 +26,78 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
 
         // GET: PhieuDatPhong?tuKhoa=...&trangThai=...&tuNgay=...&denNgay=...
         public async Task<IActionResult> Index(string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay)
+        {
+            var model = new PhieuDatPhongIndexViewModel
+            {
+                TuKhoa = string.IsNullOrWhiteSpace(tuKhoa) ? tuKhoa : tuKhoa.Trim(),
+                TrangThai = trangThai,
+                TuNgay = tuNgay,
+                DenNgay = denNgay,
+                DanhSach = await TaoTruyVanLoc(tuKhoa, trangThai, tuNgay, denNgay)
+                    .OrderByDescending(p => p.NgayDat)
+                    .ToListAsync()
+            };
+
+            return View(model);
+        }
+
+        // GET: PhieuDatPhong/XuatExcel?tuKhoa=...&trangThai=...&tuNgay=...&denNgay=...
+        // Xuất đúng danh sách đang hiển thị (cùng điều kiện lọc với Index) ra file Excel .xlsx
+        public async Task<IActionResult> XuatExcel(string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay)
+        {
+            var danhSach = await TaoTruyVanLoc(tuKhoa, trangThai, tuNgay, denNgay)
+                .OrderByDescending(p => p.NgayDat)
+                .ToListAsync();
+
+            using var workbook = new XLWorkbook();
+            var sheet = workbook.Worksheets.Add("Phiếu đặt phòng");
+
+            // Dòng tiêu đề
+            string[] tieuDe = { "Mã phiếu", "Khách hàng", "Phòng", "Ngày đặt", "Ngày nhận dự kiến",
+                                "Ngày trả dự kiến", "Tổng tiền dự kiến (đ)", "Trạng thái" };
+            for (int i = 0; i < tieuDe.Length; i++)
+            {
+                sheet.Cell(1, i + 1).Value = tieuDe[i];
+            }
+            var dongTieuDe = sheet.Range(1, 1, 1, tieuDe.Length);
+            dongTieuDe.Style.Font.Bold = true;
+            dongTieuDe.Style.Fill.BackgroundColor = XLColor.FromHtml("#0F3D3E");
+            dongTieuDe.Style.Font.FontColor = XLColor.White;
+
+            // Mỗi phiếu một dòng
+            int dong = 2;
+            foreach (var p in danhSach)
+            {
+                sheet.Cell(dong, 1).Value = p.MaPhieuDat;
+                sheet.Cell(dong, 2).Value = p.KhachHang?.HoTen ?? "";
+                sheet.Cell(dong, 3).Value = string.Join(", ", p.ChiTietDatPhongs.Select(c => c.Phong?.SoPhong));
+                sheet.Cell(dong, 4).Value = p.NgayDat;
+                sheet.Cell(dong, 5).Value = p.NgayNhanDuKien;
+                sheet.Cell(dong, 6).Value = p.NgayTraDuKien;
+                sheet.Cell(dong, 7).Value = p.TongTienDuKien;
+                sheet.Cell(dong, 8).Value = TenTrangThaiPhieu(p.TrangThai);
+                dong++;
+            }
+
+            // Định dạng ngày và tiền, tự giãn độ rộng cột
+            sheet.Column(4).Style.DateFormat.Format = "dd/MM/yyyy HH:mm";
+            sheet.Column(5).Style.DateFormat.Format = "dd/MM/yyyy";
+            sheet.Column(6).Style.DateFormat.Format = "dd/MM/yyyy";
+            sheet.Column(7).Style.NumberFormat.Format = "#,##0";
+            sheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+
+            string tenFile = $"PhieuDatPhong_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
+            return File(
+                stream.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                tenFile);
+        }
+
+        // Dùng chung cho Index và XuatExcel để hai nơi luôn lọc giống hệt nhau
+        private IQueryable<PhieuDatPhong> TaoTruyVanLoc(string? tuKhoa, string? trangThai, DateTime? tuNgay, DateTime? denNgay)
         {
             var query = _context.PhieuDatPhongs
                 .Include(p => p.KhachHang)
@@ -58,16 +131,7 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
                 query = query.Where(p => p.NgayNhanDuKien < den);
             }
 
-            var model = new PhieuDatPhongIndexViewModel
-            {
-                TuKhoa = tuKhoa,
-                TrangThai = trangThai,
-                TuNgay = tuNgay,
-                DenNgay = denNgay,
-                DanhSach = await query.OrderByDescending(p => p.NgayDat).ToListAsync()
-            };
-
-            return View(model);
+            return query;
         }
 
         // GET: PhieuDatPhong/Details/5
@@ -260,6 +324,16 @@ namespace QuanLyKhachSan_UNETI06_TI17A4HN.Controllers
             }
             return null;
         }
+
+        private static string TenTrangThaiPhieu(string trangThai) => trangThai switch
+        {
+            TrangThaiPhieu.ChoXacNhan => "Chờ xác nhận",
+            TrangThaiPhieu.DaXacNhan => "Đã xác nhận",
+            TrangThaiPhieu.DaNhanPhong => "Đã nhận phòng",
+            TrangThaiPhieu.DaTraPhong => "Đã trả phòng",
+            TrangThaiPhieu.DaHuy => "Đã hủy",
+            _ => trangThai
+        };
 
         private static string TenTrangThaiPhong(string? trangThai) => trangThai switch
         {
